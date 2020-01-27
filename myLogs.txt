@@ -1,0 +1,27 @@
+Starting a Gradle Daemon (subsequent builds will be faster)
+Parallel execution with configuration on demand is an incubating feature.
+:app:preBuild UP-TO-DATE
+:app:preDebugBuild UP-TO-DATE
+:app:compileDebugAidl UP-TO-DATE
+:app:compileDebugRenderscript UP-TO-DATE
+:app:checkDebugManifest UP-TO-DATE
+:app:generateDebugBuildConfig UP-TO-DATE
+:app:prepareLintJar UP-TO-DATE
+:app:mainApkListPersistenceDebug UP-TO-DATE
+:app:generateDebugResValues UP-TO-DATE
+:app:generateDebugResources UP-TO-DATE
+:app:mergeDebugResources UP-TO-DATE
+:app:createDebugCompatibleScreenManifests UP-TO-DATE
+:app:processDebugManifest UP-TO-DATE
+:app:splitsDiscoveryTaskDebug UP-TO-DATE
+:app:processDebugResources UP-TO-DATE
+:app:generateDebugSources UP-TO-DATE
+:app:javaPreCompileDebug UP-TO-DATE
+:app:compileDebugJavaWithJavac UP-TO-DATE
+:app:compileDebugNdk NO-SOURCE
+:app:compileDebugSources UP-TO-DATE
+:app:mergeDebugShaders UP-TO-DATE
+:app:compileDebugShaders UP-TO-DATE
+:app:generateDebugAssets UP-TO-DATE
+:app:mergeDebugAssets UP-TO-DATE
+:app:transformClassesWithDexBuilderForDebugBatchvorgang abbrechen (J/N)? 

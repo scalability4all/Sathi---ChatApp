@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorPrimary">#676767</color>
+    <color name="colorPrimaryDark">#505050</color>
+    <color name="colorAccent">#c78eff</color>
+    <color name="default_tstamp_color_rcv">#f7f7f9</color>
+    <color name="default_tstamp_color_send">#f7f7f9</color>
+
+    <color name="default_message_color_rcv">#f7f7f9</color>
+    <color name="default_message_color_send">#f7f7f9</color>
+
+    <color name="default_bubble_color_rcv">#f98aff</color>
+    <color name="default_bubble_color_send">#c78eff</color>
+
+    <color name="cardview_light_background">#bae2fc</color>
+
+    <color name="riv_border_color">#552a78</color>
+    <color name="chat_light_background">#cbcbcb</color>
+</resources>

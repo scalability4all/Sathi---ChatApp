@@ -1,0 +1,185 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/chat_light_background"
+    tools:context="com.philipplauer.unichat.ChatViewActivity">
+
+    <ImageView
+        android:id="@+id/imageView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="false"
+        android:layout_centerHorizontal="true"
+        android:layout_centerInParent="true"
+        android:layout_marginTop="145dp"
+        app:srcCompat="@drawable/chocolate_candy" />
+
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/chatMessagesRecyclerView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        android:layout_marginLeft="5dp"
+        android:layout_marginRight="5dp"
+        android:layout_marginTop="5dp"
+        android:paddingBottom="50dp">
+
+    </android.support.v7.widget.RecyclerView>
+
+    <RelativeLayout
+        android:id="@+id/textsend"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentLeft="true"
+        android:layout_marginBottom="5dp"
+        android:clickable="true">
+
+        <EditText
+            android:id="@+id/textinput"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_marginLeft="3dp"
+            android:layout_marginRight="3dp"
+            android:layout_toLeftOf="@+id/textSendButton"
+            android:background="@drawable/tinput_border"
+            android:ems="10"
+            android:imeOptions="flagNoExtractUi|actionSend"
+            android:inputType="textShortMessage|textMultiLine|textCapSentences"
+            android:maxLines="4"
+            android:minHeight="48dp"
+            android:minLines="1"
+            android:paddingLeft="5dp"
+            android:singleLine="false"
+            android:textColor="@color/colorPrimaryDark">
+
+        </EditText>
+
+        <ImageButton
+            android:id="@+id/textSendButton"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
+            android:layout_marginRight="3dp"
+            android:contentDescription="@string/send_message"
+            android:src="@drawable/ic_send_text_std" />
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:id="@+id/snackbar"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_above="@id/textsend"
+        android:layout_marginBottom="4dp"
+        android:layout_marginLeft="8dp"
+        android:layout_marginRight="8dp"
+        android:background="@drawable/snackbar"
+        android:minHeight="48dp">
+
+        <TextView
+            android:id="@+id/snackbar_message"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
+            android:layout_centerHorizontal="true"
+            android:text="@string/snackbar_status_text"
+            android:textColor="@android:color/background_light"
+            android:textSize="15dp" />
+
+        <TextView
+            android:id="@+id/snackbar_action_accept"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_below="@id/snackbar_message"
+            android:layout_centerVertical="true"
+            android:paddingBottom="16dp"
+            android:paddingLeft="24dp"
+            android:paddingRight="24dp"
+            android:paddingTop="16dp"
+            android:text="@string/snackbar_status_allow"
+            android:textAllCaps="true"
+            android:textColor="@android:color/background_light"
+            android:textStyle="bold" />
+
+
+        <TextView
+            android:id="@+id/snackbar_action_deny"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/snackbar_message"
+            android:layout_centerVertical="true"
+            android:layout_toLeftOf="@id/snackbar_action_accept"
+            android:paddingBottom="16dp"
+            android:paddingLeft="24dp"
+            android:paddingRight="24dp"
+            android:paddingTop="16dp"
+            android:text="@string/snackbar_status_deny"
+            android:textAllCaps="true"
+            android:textColor="@android:color/background_light"
+            android:textStyle="bold" />
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:id="@+id/snackbar_stranger"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_above="@id/textsend"
+        android:layout_marginBottom="4dp"
+        android:layout_marginLeft="8dp"
+        android:layout_marginRight="8dp"
+        android:layout_marginTop="20dp"
+        android:background="@drawable/snackbar"
+        android:minHeight="38dp">
+
+        <TextView
+            android:id="@+id/snackbar_message_stranger"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
+            android:layout_centerHorizontal="true"
+            android:text="@string/snackbar_contact_text"
+            android:textColor="@android:color/background_light"
+            android:textSize="15dp" />
+
+        <TextView
+            android:id="@+id/snackbar_action_accept_stranger"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_below="@id/snackbar_message_stranger"
+            android:layout_centerVertical="true"
+            android:paddingBottom="16dp"
+            android:paddingLeft="24dp"
+            android:paddingRight="24dp"
+            android:paddingTop="16dp"
+            android:text="@string/snackbar_status_allow"
+            android:textAllCaps="true"
+            android:textColor="@android:color/background_light"
+            android:textStyle="bold" />
+
+
+        <TextView
+            android:id="@+id/snackbar_action_deny_stranger"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/snackbar_message_stranger"
+            android:layout_centerVertical="true"
+            android:layout_toLeftOf="@id/snackbar_action_accept_stranger"
+            android:paddingBottom="16dp"
+            android:paddingLeft="140dp"
+            android:paddingRight="24dp"
+            android:paddingTop="16dp"
+            android:text="@string/snackbar_contact_allow"
+            android:textAllCaps="true"
+            android:textColor="@android:color/background_light"
+            android:textStyle="bold" />
+    </RelativeLayout>
+
+
+</RelativeLayout>

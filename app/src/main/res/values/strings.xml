@@ -1,0 +1,47 @@
+<resources>
+    <string name="app_name">Sathi</string>
+
+    <string name="prompt_jid">Jabber ID</string>
+    <string name="prompt_password">Passwort</string>
+    <string name="action_sign_in">Login</string>
+    <string name="action_register">Register</string>
+    <string name="action_sign_in_short">registration</string>
+    <string name="error_invalid_jid">JabberId invalid</string>
+    <string name="error_invalid_password">Password too short</string>
+    <string name="error_incorrect_password">Wrong password</string>
+    <string name="error_field_required">This field is required</string>
+    <string name="permission_rationale">Contact permissions are required to use auto-completion.</string>
+    <string name="user_example_com">user@example.com</string>
+    <string name="server_text">user@server.com</string>
+    <string name="last_message">Last known message ...</string>
+    <string name="send_message">Send Message</string>
+    <string name="title_activity_contact_list">Select contact</string>
+    <string name="add_contact_label_text">Jabber Id</string>
+    <string name="add_contact_confirm_text">OK</string>
+    <string name="add_contact_cancel_text">Abort</string>
+    <string name="me">Mein Profil</string>
+    <string name="title_me_activity">Mein Profil</string>
+    <string name="ignore_bat_allow">Allow</string>
+    <string name="delete_contact">delete contact</string>
+    <string name="contact_details">Contact details</string>
+    <string name="delete_chat">Delete chat</string>
+    <string name="delete_message">delete message</string>
+    <string name="contact_details_chat_view">Contact details</string>
+    <string name="login_register_dialog_title">Create a new user</string>
+    <string name="notregistered">Registration could not be completed</string>
+    <string name="registered">Registration completed</string>
+    <string name="chatListTitle">Chats</string>
+    <string name="contactListTitle">Contacts</string>
+
+    <string name="snackbar_status_text">Allow online status subscription?</string>
+    <string name="snackbar_status_deny">Refuse</string>
+    <string name="snackbar_status_allow">Allow</string>
+    <string name="snackbar_contact_text">Allow Contact Request?</string>
+    <string name="snackbar_contact_allow">Allow</string>
+    <string name="snackbar_contact_deny">Refuse</string>
+    <string name="logout">Logout</string>
+    <string name="groupchat">Join group chat</string>
+    <string name="chatname">Group Name</string>
+    <string name="creategroup">Create</string>
+    <string name="groupchat_members">Members</string>
+</resources>

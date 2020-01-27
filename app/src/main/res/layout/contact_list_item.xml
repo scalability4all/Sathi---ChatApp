@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+
+    android:layout_height="wrap_content"
+
+    android:layout_marginBottom="2dp"
+    android:background="#f0f0f0">
+
+    <com.makeramen.roundedimageview.RoundedImageView
+        android:id="@+id/profile_contact"
+        android:layout_width="72dp"
+        android:layout_height="90dp"
+        android:layout_marginRight="10dp"
+        android:layout_marginStart="5dp"
+        android:src="@drawable/ic_profile"
+        app:riv_border_color="@color/riv_border_color"
+        app:riv_border_width="1dip"
+        app:riv_corner_radius="52dp" />
+
+    <FrameLayout xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:id="@+id/message_body"
+        android:layout_width="match_parent"
+        android:layout_height="90dp"
+        android:layout_marginStart="5dp"
+        android:layout_toRightOf="@id/profile_contact">
+
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="end"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/contact_jid_string"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:text="user@example.com"
+                android:textColor="@color/default_bubble_color_rcv"
+                android:textSize="@dimen/default_message_chat_text_size"
+                tools:text="user@server.com" />
+
+            <android.support.v4.widget.Space
+                android:layout_width="match_parent"
+                android:layout_height="4dp" />
+
+            <TextView
+                android:id="@+id/suscription_type"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Subscription type" />
+
+            <android.support.v4.widget.Space
+                android:layout_width="match_parent"
+                android:layout_height="4dp" />
+
+        </LinearLayout>
+
+
+    </FrameLayout>
+
+
+</RelativeLayout>
+
+
+
+
+
+
+
+
