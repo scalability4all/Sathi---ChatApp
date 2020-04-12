@@ -2,9 +2,14 @@ package com.philipplauer.unichat;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.pm.PackageManager;
+import android.net.Uri;
 import android.os.Bundle;
+import android.speech.RecognizerIntent;
+import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.PopupMenu;
@@ -17,6 +22,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -28,6 +34,11 @@ import com.philipplauer.unichat.model.ContactModel;
 import com.philipplauer.unichat.ui.KeyboardUtil;
 import com.philipplauer.unichat.xmpp.RoosterConnectionService;
 
+import android.app.AlertDialog;
+
+import java.net.URLEncoder;
+import java.util.ArrayList;
+
 public class ChatViewActivity extends AppCompatActivity implements ChatMessagesAdapter.OnInformRecyclerViewToScrollDownListener,KeyboardUtil.KeyboardVisibilityListener,ChatMessagesAdapter.OnItemLongClickListener {
     private static final String LOGTAG = "ChatViewActivity" ;
     RecyclerView chatMessagesRecyclerView ;
@@ -37,6 +48,7 @@ public class ChatViewActivity extends AppCompatActivity implements ChatMessagesA
     private String counterpartJid;
     private BroadcastReceiver mReceiveMessageBroadcastReceiver;
     private View snackbar;
+    private static final int SPEECH_REQUEST_CODE = 10;
     private View snackbarStranger;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,6 +64,39 @@ public class ChatViewActivity extends AppCompatActivity implements ChatMessagesA
         adapter.setmOnInformRecyclerViewToScrollDownListener(this);
         adapter.setOnItemLongClickListener(this);
         chatMessagesRecyclerView.setAdapter(adapter);
+        //ImageView sendButton = findViewById(R.id.send_btn);
+        //ImageView cancelButton = findViewById(R.id.cancel_btn);
+        ImageButton recordButton = findViewById(R.id.record_button);
+        recordButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
+                intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
+                startActivityForResult(intent, 10);
+            }
+        });
+        final String contactName = ""; // TODO
+        final String contactNumber = ""; //TODO
+//        sendButton.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                AlertDialog alertDialog = new AlertDialog.Builder(ChatViewActivity.this)
+//                        .setMessage(contactName + " " + getString(R.string.whatsapp_dialog_message))
+//                        .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+//                            @Override
+//                            public void onClick(DialogInterface dialog, int which) {
+//                                dialog.dismiss();
+//                            }
+//                        }).setPositiveButton("Send", new DialogInterface.OnClickListener() {
+//                            @Override
+//                            public void onClick(DialogInterface dialog, int which) {
+//                                sendWhatsApp(contactNumber, "Hey, Sending message from Zing!");
+//                            }
+//                        })
+//                        .create();
+//                alertDialog.show();
+//            }
+//        });
         textSendEditText = findViewById(R.id.textinput);
         sendMessageButton = findViewById(R.id.textSendButton);
         sendMessageButton.setOnClickListener(new View.OnClickListener() {
@@ -64,6 +109,7 @@ public class ChatViewActivity extends AppCompatActivity implements ChatMessagesA
                 }
             }
         });
+
         // Abfrage ob Kontakt fremd, entsprechende Snackbar einblenden
         snackbar = findViewById(R.id.snackbar);
         snackbarStranger = findViewById(R.id.snackbar_stranger);
@@ -240,5 +286,37 @@ public class ChatViewActivity extends AppCompatActivity implements ChatMessagesA
             }
         });
         popup.show();
+    }
+    private void sendWhatsApp(String phone, String message) {
+        PackageManager packageManager = this.getPackageManager();
+        Intent i = new Intent(Intent.ACTION_VIEW);
+        try {
+            String url = "https://api.whatsapp.com/send?phone=" + phone + "&text=" + URLEncoder.encode(message, "UTF-8");
+            i.setPackage("com.whatsapp");
+            i.setData(Uri.parse(url));
+            if (i.resolveActivity(packageManager) != null) {
+                this.startActivity(i);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        Log.d("speech2", String.valueOf(requestCode));
+        if (requestCode == SPEECH_REQUEST_CODE && resultCode == RESULT_OK) {
+            ArrayList<String> speechData = data.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS);
+            if (speechData.size() > 0) {
+                String spokenText = speechData.get(0);
+                EditText edit_text = (EditText) findViewById(R.id.textinput);
+                String current_text = edit_text.getText().toString();
+                if(current_text.length() != 0){
+                    current_text = current_text + ".";
+                }
+                edit_text.setText(current_text + spokenText);
+                Log.d("speech", speechData.toString());
+            }
+        }
+        super.onActivityResult(requestCode, resultCode, data);
     }
 }

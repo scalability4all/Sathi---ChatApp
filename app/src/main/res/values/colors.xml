@@ -16,4 +16,11 @@
 
     <color name="riv_border_color">#552a78</color>
     <color name="chat_light_background">#cbcbcb</color>
+<!--    <color name="colorPrimary">#A0024C</color>-->
+<!--    <color name="colorPrimaryDark">#750238</color>-->
+    <color name="colorPrimaryDoubleDark">#470022</color>
+<!--    <color name="colorAccent">#DF045B</color>-->
+    <color name="bottomChatBar">#015850</color>
+    <color name="background_light">#FDFDFD</color>
+    <color name="background_dark">#FAFAFA</color>
 </resources>

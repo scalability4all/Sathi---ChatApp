@@ -210,7 +210,7 @@ public class LoginActivity extends AppCompatActivity{
     private void attemptRegister(final String username, final String password) throws IOException{
         XMPPTCPConnectionConfiguration conf = XMPPTCPConnectionConfiguration.builder()
                 .setXmppDomain(serverurl)
-                .setHost("34.93.29.166")
+                .setHost(getResources().getString(R.string.xmpp_host))
                 .setResource("SATHI")
                 .setKeystoreType(null)
                 .setSendPresence(true)

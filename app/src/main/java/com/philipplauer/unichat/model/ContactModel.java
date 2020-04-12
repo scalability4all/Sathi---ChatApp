@@ -33,6 +33,7 @@ public class ContactModel {
     }
     public List<Contact> getContacts()
     {
+
         List<Contact> contacts = new ArrayList<>();
         Contact contact1 = new Contact("bob@localhost", Contact.SubscriptionType.NONE);
         contacts.add(contact1);

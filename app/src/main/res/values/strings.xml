@@ -1,6 +1,7 @@
 <resources>
     <string name="app_name">Sathi</string>
-
+    
+    <string name="xmpp_host">34.93.240.242</string>
     <string name="prompt_jid">Jabber ID</string>
     <string name="prompt_password">Passwort</string>
     <string name="action_sign_in">Login</string>
@@ -44,4 +45,6 @@
     <string name="chatname">Group Name</string>
     <string name="creategroup">Create</string>
     <string name="groupchat_members">Members</string>
+    
+    <string name="whatsapp_dialog_message">is not using Zing. Do you want to send the message on Whatsapp?</string>
 </resources>

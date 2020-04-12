@@ -1,14 +1,18 @@
 package com.philipplauer.unichat;
 
+import android.Manifest;
 import android.app.Dialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.design.widget.FloatingActionButton;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.PopupMenu;
@@ -67,6 +71,7 @@ public class ChatListActivity extends AppCompatActivity implements ChatListAdapt
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_chat_list);
         setTitle(R.string.chatListTitle);
+        getContactPermission();
         //Loginstatus abrufen, Falls nicht eingeloggt zurück zum LoginScreen
         boolean logged_in_state = PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).getBoolean("xmpp_logged_in", false);
         if (!logged_in_state) {
@@ -103,7 +108,15 @@ public class ChatListActivity extends AppCompatActivity implements ChatListAdapt
     @Override
     protected void onPause() {
         super.onPause();
-        unregisterReceiver(mBroadcastReceiver);
+        try {
+
+            //Register or UnRegister your broadcast receiver here
+            unregisterReceiver(mBroadcastReceiver);
+        } catch(IllegalArgumentException e) {
+
+            e.printStackTrace();
+        }
+
     }
 
     @Override
@@ -145,7 +158,14 @@ public class ChatListActivity extends AppCompatActivity implements ChatListAdapt
         if (item.getItemId() == R.id.logout) {
             SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
             prefs.edit().clear().commit();
-            unregisterReceiver(mBroadcastReceiver);
+            try {
+
+                //Register or UnRegister your broadcast receiver here
+                unregisterReceiver(mBroadcastReceiver);
+            } catch(IllegalArgumentException e) {
+
+                e.printStackTrace();
+            }
             Intent l = new Intent(ChatListActivity.this, LoginActivity.class);
             startActivity(l);
             finish();
@@ -175,7 +195,7 @@ public class ChatListActivity extends AppCompatActivity implements ChatListAdapt
                             //XMPPConnection ohne login nur für Gruppenchat
                             XMPPTCPConnectionConfiguration conf = XMPPTCPConnectionConfiguration.builder()
                                     .setXmppDomain(serverurl)
-                                    .setHost("34.93.29.166")
+                                    .setHost(getResources().getString(R.string.xmpp_host))
                                     .setResource("sathi")
                                     .setKeystoreType(null)
                                     .setSendPresence(true)
@@ -271,6 +291,14 @@ public class ChatListActivity extends AppCompatActivity implements ChatListAdapt
         } catch (XmppStringprepException | MultiUserChatException.MucAlreadyJoinedException | InterruptedException | XMPPException.XMPPErrorException | MultiUserChatException.MissingMucCreationAcknowledgeException |
                 SmackException.NotConnectedException | SmackException.NoResponseException | MultiUserChatException.NotAMucServiceException | MultiUserChatException.MucConfigurationNotSupportedException e) {
             e.printStackTrace();
+        }
+    }
+
+    private void getContactPermission() {
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_CONTACTS) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this,
+                    new String[]{Manifest.permission.READ_CONTACTS},
+                    101);
         }
     }
 }

@@ -8,7 +8,9 @@ import android.graphics.BitmapFactory;
 import android.preference.PreferenceManager;
 import android.util.Log;
 
+
 import com.philipplauer.unichat.Constants;
+import com.philipplauer.unichat.R;
 import com.philipplauer.unichat.Utilities;
 import com.philipplauer.unichat.model.ChatMessage;
 import com.philipplauer.unichat.model.ChatMessagesModel;
@@ -124,7 +126,7 @@ public class RoosterConnection implements ConnectionListener, SubscribeListener,
         mConnectionState = ConnectionState.CONNECTING;
         updateActivitiesOfConnectionStateChange(ConnectionState.CONNECTING);
         gatherCredentials();
-        InetAddress addr = InetAddress.getByName("34.93.29.166");
+        InetAddress addr = InetAddress.getByName(mApplicationContext.getResources().getString(R.string.xmpp_host));
         HostnameVerifier verifier = new HostnameVerifier() {
             @Override
             public boolean verify(String hostname, SSLSession session) {
@@ -133,7 +135,7 @@ public class RoosterConnection implements ConnectionListener, SubscribeListener,
         };
         XMPPTCPConnectionConfiguration conf = XMPPTCPConnectionConfiguration.builder()
                 .setXmppDomain(serverurl)
-                .setHost("34.93.29.166")
+                .setHost(mApplicationContext.getResources().getString(R.string.xmpp_host))
                 .setResource("sathi")
                 .setKeystoreType(null) //This line seems to get rid of the problem
                 .setSendPresence(true)
