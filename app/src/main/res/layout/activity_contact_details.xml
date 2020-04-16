@@ -9,7 +9,7 @@
     android:background="@color/cardview_light_background"
 
     android:paddingBottom="@dimen/activity_vertical_margin"
-    tools:context="com.philipplauer.unichat.ContactDetailsActivity">
+    tools:context="com.scalability4all.sathi.ContactDetailsActivity">
 
     <com.makeramen.roundedimageview.RoundedImageView
         android:id="@+id/contact_details_user_profile"

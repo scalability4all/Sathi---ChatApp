@@ -10,7 +10,7 @@
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
-    tools:context="com.philipplauer.unichat.LoginActivity">
+    tools:context="com.scalability4all.sathi.LoginActivity">
 
     <!-- Login progress -->
     <ProgressBar
