@@ -21,6 +21,6 @@ public class ExampleInstrumentedTest {
         // Context of the app under test.
         Context appContext = InstrumentationRegistry.getTargetContext();
 
-        assertEquals("com.philipplauer.unichat", appContext.getPackageName());
+        assertEquals("com.scalability4all.sathi", appContext.getPackageName());
     }
 }
