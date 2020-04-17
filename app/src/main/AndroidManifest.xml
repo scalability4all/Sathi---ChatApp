@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.philipplauer.unichat">
+    package="com.scalability4all.sathi">
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
@@ -15,10 +15,10 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity
-            android:name=".LoginActivity"
+            android:name="com.scalability4all.sathi.LoginActivity"
             android:label="@string/app_name"
             android:theme="@style/AppTheme.NoActionBar" />
-        <activity android:name=".ChatListActivity">
+        <activity android:name="com.scalability4all.sathi.ChatListActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -26,23 +26,23 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".ChatViewActivity"
-            android:parentActivityName=".ChatListActivity" />
+            android:name="com.scalability4all.sathi.ChatViewActivity"
+            android:parentActivityName="com.scalability4all.sathi.ChatListActivity" />
         <activity
-            android:name=".ContactListActivity"
+            android:name="com.scalability4all.sathi.ContactListActivity"
             android:label="@string/title_activity_contact_list"
             android:theme="@style/AppTheme.NoActionBar"></activity>
 
-        <service android:name=".xmpp.RoosterConnectionService" />
+        <service android:name="com.scalability4all.sathi.xmpp.RoosterConnectionService" />
 
         <activity
-            android:name=".MeActivity"
+            android:name="com.scalability4all.sathi.MeActivity"
             android:label="@string/title_me_activity"
-            android:parentActivityName=".ChatListActivity" />
+            android:parentActivityName="com.scalability4all.sathi.ChatListActivity" />
         <activity
-            android:name=".ContactDetailsActivity"
-            android:parentActivityName=".ContactListActivity" />
-        <activity android:name=".MutliUserChatViewActivity"></activity>
+            android:name="com.scalability4all.sathi.ContactDetailsActivity"
+            android:parentActivityName="com.scalability4all.sathi.ContactListActivity" />
+        <activity android:name="com.scalability4all.sathi.MutliUserChatViewActivity"></activity>
     </application>
 
 </manifest>
