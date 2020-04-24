@@ -6,11 +6,10 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
-import android.preference.PreferenceManager;
-import android.support.v7.app.AppCompatActivity;
-
 import android.os.Build;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
+import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.KeyEvent;
@@ -21,7 +20,17 @@ import android.widget.AutoCompleteTextView;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonArrayRequest;
+import com.android.volley.toolbox.JsonObjectRequest;
+import com.android.volley.toolbox.JsonRequest;
+import com.android.volley.toolbox.StringRequest;
+import com.android.volley.toolbox.Volley;
 import com.scalability4all.sathi.xmpp.RoosterConnectionService;
 
 import org.jivesoftware.smack.AbstractXMPPConnection;
@@ -32,9 +41,14 @@ import org.jivesoftware.smack.XMPPException;
 import org.jivesoftware.smack.tcp.XMPPTCPConnection;
 import org.jivesoftware.smack.tcp.XMPPTCPConnectionConfiguration;
 import org.jivesoftware.smackx.iqregister.AccountManager;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.jxmpp.jid.parts.Localpart;
 
 import java.io.IOException;
+
+
 
 public class LoginActivity extends AppCompatActivity{
     private static final String LOGTAG = "RoosterPlus";
@@ -189,9 +203,45 @@ public class LoginActivity extends AppCompatActivity{
                 .putString("xmpp_jid", mJidView.getText().toString())
                 .putString("xmpp_password", mPasswordView.getText().toString())
                 .commit();
+        // TODO Need to remove this function and keep after successfull authentications
+        this.getUserPreferenceData(mJidView.getText().toString());
         Intent i1 = new Intent(this, RoosterConnectionService.class);
         startService(i1);
     }
+
+    private void getUserPreferenceData(String username) {
+        String URLline = "http://34.93.240.242:4567/user/details/"+ username.split("@")[0];;
+        StringRequest stringRequest = new StringRequest(Request.Method.GET, URLline,
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        try {
+                            JSONObject responseObject = new JSONObject(new JSONObject(response).getString("response"));
+                           if(responseObject.getString("status")=="ok") {
+                                JSONObject data=new JSONObject(responseObject.getString("data"));
+                                SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(LoginActivity.this);
+                                String categories = data.getString("category").replaceAll("(^\\[|\\]$)", "").replace(", ", ",");
+                                prefs.edit()
+                                        .putString("language", data.getString("language"))
+                                        .putString("category", categories)
+                                        .commit();
+                           }
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        Log.d(LOGTAG, " Getting preference and language :" + error.getMessage());
+                    }
+                });
+        // request queue
+        RequestQueue requestQueue = Volley.newRequestQueue(this);
+        requestQueue.add(stringRequest);
+    }
+
     private void saveCredentialsAndLoginR(String username, String password)
     {
         Log.d(LOGTAG,"saveCredentialsAndLogin() called.");
