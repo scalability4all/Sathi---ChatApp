@@ -20,14 +20,7 @@ import android.widget.AutoCompleteTextView;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import com.android.volley.Request;
-import com.android.volley.RequestQueue;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
-import com.android.volley.toolbox.StringRequest;
-import com.android.volley.toolbox.Volley;
 import com.scalability4all.sathi.services.VolleyCallback;
 import com.scalability4all.sathi.services.VolleyService;
 import com.scalability4all.sathi.xmpp.RoosterConnectionService;
@@ -225,7 +218,6 @@ public class LoginActivity extends AppCompatActivity{
                     for (int i=0; i<category.length(); i++) {
                         categories.append(category.get(i)).append(",");
                     }
-//                    CharSequence categories = newsCategory.toString().substring(1,newsCategory.toString().length()-1);
                     prefs.edit()
                             .putString("language", data.getString("language"))
                             .putString("category", String.valueOf(categories))
