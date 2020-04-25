@@ -26,11 +26,10 @@ import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
-import com.android.volley.toolbox.JsonArrayRequest;
-import com.android.volley.toolbox.JsonObjectRequest;
-import com.android.volley.toolbox.JsonRequest;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
+import com.scalability4all.sathi.services.VolleyCallback;
+import com.scalability4all.sathi.services.VolleyService;
 import com.scalability4all.sathi.xmpp.RoosterConnectionService;
 
 import org.jivesoftware.smack.AbstractXMPPConnection;
@@ -47,7 +46,10 @@ import org.json.JSONObject;
 import org.jxmpp.jid.parts.Localpart;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
+import static com.scalability4all.sathi.services.VolleyService.GET_USER_DETAILS;
 
 
 public class LoginActivity extends AppCompatActivity{
@@ -135,6 +137,8 @@ public class LoginActivity extends AppCompatActivity{
                     case Constants.BroadCastMessages.UI_AUTHENTICATED:
                         Log.d(LOGTAG,"Mainscreen opens\n");
                         showProgress(false);
+                        // getting user details
+                        getUserPreferenceData(mJidView.getText().toString());
                         Intent i = new Intent(getApplicationContext(),ChatListActivity.class);
                         startActivity(i);
                         finish();
@@ -203,43 +207,44 @@ public class LoginActivity extends AppCompatActivity{
                 .putString("xmpp_jid", mJidView.getText().toString())
                 .putString("xmpp_password", mPasswordView.getText().toString())
                 .commit();
-        // TODO Need to remove this function and keep after successfull authentications
-        this.getUserPreferenceData(mJidView.getText().toString());
+
         Intent i1 = new Intent(this, RoosterConnectionService.class);
         startService(i1);
     }
 
     private void getUserPreferenceData(String username) {
-        String URLline = "http://34.93.240.242:4567/user/details/"+ username.split("@")[0];;
-        StringRequest stringRequest = new StringRequest(Request.Method.GET, URLline,
-                new Response.Listener<String>() {
-                    @Override
-                    public void onResponse(String response) {
-                        try {
-                            JSONObject responseObject = new JSONObject(new JSONObject(response).getString("response"));
-                           if(responseObject.getString("status")=="ok") {
-                                JSONObject data=new JSONObject(responseObject.getString("data"));
-                                SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(LoginActivity.this);
-                                String categories = data.getString("category").replaceAll("(^\\[|\\]$)", "").replace(", ", ",");
-                                prefs.edit()
-                                        .putString("language", data.getString("language"))
-                                        .putString("category", categories)
-                                        .commit();
-                           }
-                        } catch (JSONException e) {
-                            e.printStackTrace();
-                        }
+        new VolleyService(new VolleyCallback() {
+            @Override
+            public void notifySuccess(JSONObject response) throws JSONException {
+                try {
+                    JSONObject data=new JSONObject(response.getString("data"));
+                    SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(LoginActivity.this);
+                    List<CharSequence> newsCategory = new ArrayList<CharSequence>();
+                    JSONArray category=new JSONArray(data.getString("category"));
+                    StringBuilder categories = new StringBuilder("");
+                    for (int i=0; i<category.length(); i++) {
+                        categories.append(category.get(i)).append(",");
                     }
-                },
-                new Response.ErrorListener() {
-                    @Override
-                    public void onErrorResponse(VolleyError error) {
-                        Log.d(LOGTAG, " Getting preference and language :" + error.getMessage());
-                    }
-                });
-        // request queue
-        RequestQueue requestQueue = Volley.newRequestQueue(this);
-        requestQueue.add(stringRequest);
+//                    CharSequence categories = newsCategory.toString().substring(1,newsCategory.toString().length()-1);
+                    prefs.edit()
+                            .putString("language", data.getString("language"))
+                            .putString("category", String.valueOf(categories))
+                            .commit();
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+            @Override
+            public void notifyError(JSONObject error) {
+                try {
+                    Log.d(LOGTAG,"Parse error in getting user details");
+                    Log.d(LOGTAG,error.getString("data"));
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+
+            }
+        },LoginActivity.this).getDataVolley(GET_USER_DETAILS+'/'+username.split("@")[0]);
     }
 
     private void saveCredentialsAndLoginR(String username, String password)
