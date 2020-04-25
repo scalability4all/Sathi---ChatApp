@@ -169,7 +169,10 @@ public class ChatListActivity extends AppCompatActivity implements ChatListAdapt
             Intent l = new Intent(ChatListActivity.this, LoginActivity.class);
             startActivity(l);
             finish();
-        } else if (item.getItemId() != R.id.logout) { //R.id.groupchat
+        }  else if(item.getItemId() == R.id.settings) {
+            Intent l = new Intent(ChatListActivity.this, Settings.class);
+            startActivity(l);
+        }   else if (item.getItemId() != R.id.logout) { //R.id.groupchat
             // Gruppenchat Dialog
             final Dialog dialog = new Dialog(ChatListActivity.this);
             dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);

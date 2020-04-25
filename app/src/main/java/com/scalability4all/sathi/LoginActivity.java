@@ -6,11 +6,10 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
-import android.preference.PreferenceManager;
-import android.support.v7.app.AppCompatActivity;
-
 import android.os.Build;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
+import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.KeyEvent;
@@ -22,6 +21,8 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.scalability4all.sathi.services.VolleyCallback;
+import com.scalability4all.sathi.services.VolleyService;
 import com.scalability4all.sathi.xmpp.RoosterConnectionService;
 
 import org.jivesoftware.smack.AbstractXMPPConnection;
@@ -32,9 +33,17 @@ import org.jivesoftware.smack.XMPPException;
 import org.jivesoftware.smack.tcp.XMPPTCPConnection;
 import org.jivesoftware.smack.tcp.XMPPTCPConnectionConfiguration;
 import org.jivesoftware.smackx.iqregister.AccountManager;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.jxmpp.jid.parts.Localpart;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+
+import static com.scalability4all.sathi.services.VolleyService.GET_USER_DETAILS;
+
 
 public class LoginActivity extends AppCompatActivity{
     private static final String LOGTAG = "RoosterPlus";
@@ -121,6 +130,8 @@ public class LoginActivity extends AppCompatActivity{
                     case Constants.BroadCastMessages.UI_AUTHENTICATED:
                         Log.d(LOGTAG,"Mainscreen opens\n");
                         showProgress(false);
+                        // getting user details
+                        getUserPreferenceData(mJidView.getText().toString());
                         Intent i = new Intent(getApplicationContext(),ChatListActivity.class);
                         startActivity(i);
                         finish();
@@ -189,9 +200,45 @@ public class LoginActivity extends AppCompatActivity{
                 .putString("xmpp_jid", mJidView.getText().toString())
                 .putString("xmpp_password", mPasswordView.getText().toString())
                 .commit();
+
         Intent i1 = new Intent(this, RoosterConnectionService.class);
         startService(i1);
     }
+
+    private void getUserPreferenceData(String username) {
+        new VolleyService(new VolleyCallback() {
+            @Override
+            public void notifySuccess(JSONObject response) throws JSONException {
+                try {
+                    JSONObject data=new JSONObject(response.getString("data"));
+                    SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(LoginActivity.this);
+                    List<CharSequence> newsCategory = new ArrayList<CharSequence>();
+                    JSONArray category=new JSONArray(data.getString("category"));
+                    StringBuilder categories = new StringBuilder("");
+                    for (int i=0; i<category.length(); i++) {
+                        categories.append(category.get(i)).append(",");
+                    }
+                    prefs.edit()
+                            .putString("language", data.getString("language"))
+                            .putString("category", String.valueOf(categories))
+                            .commit();
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+            @Override
+            public void notifyError(JSONObject error) {
+                try {
+                    Log.d(LOGTAG,"Parse error in getting user details");
+                    Log.d(LOGTAG,error.getString("data"));
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+
+            }
+        },LoginActivity.this).getDataVolley(GET_USER_DETAILS+'/'+username.split("@")[0]);
+    }
+
     private void saveCredentialsAndLoginR(String username, String password)
     {
         Log.d(LOGTAG,"saveCredentialsAndLogin() called.");
