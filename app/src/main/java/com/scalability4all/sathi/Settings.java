@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static com.scalability4all.sathi.services.VolleyService.UPDATE_USER_PREFERENCE_CATEGORY;
 import static com.scalability4all.sathi.services.VolleyService.UPDATE_USER_PREFERENCE_LANGUAGE;
@@ -32,7 +33,7 @@ public class Settings extends AppCompatActivity  {
     private static final String LOGTAG = "Settings";
     private String languageSelected;
     private String[] newsCategoriesSelected;
-    private CharSequence[] languages = {"english", "hindi", "telugu"};
+    private CharSequence[] languages = {"english", "hindi", "telugu", "punjabi", "tamil"};
     private CharSequence[] newsCategories = {"Business","Politics","Entertainment", "Fashion", "Education"};
     private EditText language;
     private EditText newsCategory;
@@ -52,7 +53,12 @@ public class Settings extends AppCompatActivity  {
         if(username!=null) {
             username=username.split("@")[0];
         }
-
+        Map<String, String> languages_locale = new HashMap< String, String>();
+        languages_locale.put("english", "en-IN");
+        languages_locale.put("hindi", "hi-IN");
+        languages_locale.put("punjabi", "pa-guru-IN");
+        languages_locale.put("tamil", "ta-IN");
+        languages_locale.put("telugu", "te-IN");
         selectedLanguage = sh.getString("language",null);
         String newsCategorySavedInDb=sh.getString("category",null);
         if(newsCategorySavedInDb!=null && newsCategorySavedInDb.length()>0) {
@@ -65,6 +71,7 @@ public class Settings extends AppCompatActivity  {
         language=(EditText)findViewById(R.id.language);
         language.setInputType(InputType.TYPE_NULL);
         language.setText(selectedLanguage);
+        final Map<String, String> languages_locale_final = languages_locale;
         language.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
@@ -94,7 +101,7 @@ public class Settings extends AppCompatActivity  {
                                     language.setText(selectedLanguage);
                                     HashMap data = new HashMap();
                                     data.put("username", username);
-                                    data.put("language",selectedLanguage);
+                                    data.put("language", languages_locale_final.get(selectedLanguage));
                                     VolleyService mVolleyService = new VolleyService(new VolleyCallback() {
                                         @Override
                                         public void notifySuccess(JSONObject response) throws JSONException {
@@ -102,7 +109,7 @@ public class Settings extends AppCompatActivity  {
                                                 JSONObject data=new JSONObject(response.getString("data"));
                                                 SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(Settings.this);
                                                 prefs.edit()
-                                                        .putString("language", data.getString("language"))
+                                                        .putString("language", selectedLanguage)
                                                         .commit();
                                             } catch (JSONException e) {
                                                 e.printStackTrace();

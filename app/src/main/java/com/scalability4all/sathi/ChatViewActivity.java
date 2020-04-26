@@ -4,9 +4,11 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.speech.RecognizerIntent;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
@@ -34,6 +36,9 @@ import com.scalability4all.sathi.xmpp.RoosterConnectionService;
 
 import java.net.URLEncoder;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Locale;
+import java.util.Map;
 
 public class ChatViewActivity extends AppCompatActivity implements ChatMessagesAdapter.OnInformRecyclerViewToScrollDownListener,KeyboardUtil.KeyboardVisibilityListener,ChatMessagesAdapter.OnItemLongClickListener {
     private static final String LOGTAG = "ChatViewActivity" ;
@@ -63,11 +68,21 @@ public class ChatViewActivity extends AppCompatActivity implements ChatMessagesA
         //ImageView sendButton = findViewById(R.id.send_btn);
         //ImageView cancelButton = findViewById(R.id.cancel_btn);
         ImageButton recordButton = findViewById(R.id.record_button);
+        Map<String, String> languages = new HashMap< String, String>();
+        languages.put("english", "en-IN");
+        languages.put("hindi", "hi-IN");
+        languages.put("punjabi", "pa-guru-IN");
+        languages.put("tamil", "ta-IN");
+        languages.put("telugu", "te-IN");
+        SharedPreferences pref= PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+        String language = pref.getString("language", "english");
+        final String lan_locale = languages.get(language);
         recordButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
                 intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
+                intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE, lan_locale);
                 startActivityForResult(intent, 10);
             }
         });

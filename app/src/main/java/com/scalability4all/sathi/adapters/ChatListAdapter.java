@@ -1,8 +1,13 @@
 package com.scalability4all.sathi.adapters;
 
 import android.content.Context;
+import android.content.res.Resources;
+import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
+import android.support.v4.content.res.ResourcesCompat;
 import android.support.v7.widget.RecyclerView;
+import android.text.Html;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -50,7 +55,7 @@ public class ChatListAdapter extends RecyclerView.Adapter<ChatHolder> {
     public ChatHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         LayoutInflater layoutInflater = LayoutInflater.from(parent.getContext());
         View view = layoutInflater.inflate(R.layout.chat_list_item, parent, false);
-        chatholder = new ChatHolder(view,this);
+        chatholder = new ChatHolder(view,this, mContext);
         return chatholder;
     }
     @Override
@@ -87,8 +92,10 @@ class ChatHolder extends RecyclerView.ViewHolder{
     private ImageView profileImage;
     private Chat mChat;
     private ChatListAdapter mChatListAdapter;
-    public ChatHolder(final View itemView , ChatListAdapter adapter) {
+    public Context mContext;
+    public ChatHolder(final View itemView , ChatListAdapter adapter, Context mContext) {
         super(itemView);
+        this.mContext = mContext;
         contactTextView = itemView.findViewById(R.id.contact_jid);
         messageAbstractTextView = itemView.findViewById(R.id.message_abstract);
         timestampTextView = itemView.findViewById(R.id.text_message_timestamp);
@@ -121,7 +128,11 @@ class ChatHolder extends RecyclerView.ViewHolder{
     {
         mChat = chat;
         contactTextView.setText(chat.getJid());
-        messageAbstractTextView.setText(chat.getLastMessage());
+        Typeface typeface = ResourcesCompat.getFont(this.mContext, R.font.nanosanslight);
+        messageAbstractTextView.setTypeface(typeface);
+        String message = chat.getLastMessage();
+        TextUtils.htmlEncode(message);
+        messageAbstractTextView.setText(Html.fromHtml(message, Html.FROM_HTML_MODE_COMPACT));
         timestampTextView.setText(Utilities.getFormattedTime(mChat.getLastMessageTimeStamp()));
         profileImage.setImageResource(R.drawable.ic_profile);
         RoosterConnection rc = RoosterConnectionService.getConnection();

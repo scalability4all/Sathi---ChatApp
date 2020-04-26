@@ -6,17 +6,21 @@ import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.preference.PreferenceManager;
+import android.sax.EndElementListener;
 import android.util.Log;
 
 
 import com.scalability4all.sathi.Constants;
 import com.scalability4all.sathi.R;
+import com.scalability4all.sathi.Settings;
 import com.scalability4all.sathi.Utilities;
 import com.scalability4all.sathi.model.ChatMessage;
 import com.scalability4all.sathi.model.ChatMessagesModel;
 import com.scalability4all.sathi.model.ChatModel;
 import com.scalability4all.sathi.model.Contact;
 import com.scalability4all.sathi.model.ContactModel;
+import com.scalability4all.sathi.services.VolleyCallback;
+import com.scalability4all.sathi.services.VolleyService;
 
 import org.jivesoftware.smack.ConnectionConfiguration;
 import org.jivesoftware.smack.ConnectionListener;
@@ -40,6 +44,9 @@ import org.jivesoftware.smackx.ping.PingManager;
 import org.jivesoftware.smackx.ping.android.ServerPingWithAlarmManager;
 import org.jivesoftware.smackx.vcardtemp.VCardManager;
 import org.jivesoftware.smackx.vcardtemp.packet.VCard;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.jxmpp.jid.EntityBareJid;
 import org.jxmpp.jid.Jid;
 import org.jxmpp.jid.impl.JidCreate;
@@ -49,14 +56,18 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.InetAddress;
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
 
 import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.SSLSession;
 
 import static com.scalability4all.sathi.model.Chat.ContactType.STRANGER;
-
+import static com.scalability4all.sathi.services.VolleyService.UPDATE_USER_PREFERENCE_CATEGORY;
+import static com.scalability4all.sathi.services.VolleyService.POST_TRANSLATION_TEXT;
 public class RoosterConnection implements ConnectionListener, SubscribeListener,RosterListener{
     private static final String LOGTAG = "RoosterConnection";
     private  final Context mApplicationContext;
@@ -121,6 +132,74 @@ public class RoosterConnection implements ConnectionListener, SubscribeListener,
     public RoosterConnection(Context mApplicationContext) {
         this.mApplicationContext = mApplicationContext;
     }
+    public void translateMessage(final String message, final String contactJid) {
+        final SharedPreferences prefs=PreferenceManager.getDefaultSharedPreferences(mApplicationContext);
+        String username=prefs.getString("xmpp_jid",null);
+        String language=prefs.getString("language",null);
+        if(username!=null) {
+            username=username.split("@")[0];
+        }
+        HashMap data = new HashMap();
+        data.put("username", username);
+        data.put("text", message);
+        //String translated_text = message;
+        Log.d(LOGTAG, username);
+        Log.d(LOGTAG, message);
+        VolleyService mVolleyService = new VolleyService(new VolleyCallback() {
+            @Override
+            public void notifySuccess(JSONObject response) throws JSONException {
+                try {
+                    JSONObject data= response.getJSONObject("data");
+                    String Responsetext = data.getString("text");
+                    try {
+                        String EncodedString = new String(Responsetext.getBytes("UTF-8"), "UTF-8");
+                        Log.d(LOGTAG, response.toString());
+                        Log.d(LOGTAG, Responsetext);
+                        Log.d(LOGTAG, EncodedString);
+                        Log.d(LOGTAG, "मस्ते");
+                        //EncodedString = "मस्ते";
+                        UpdateMessagePanel(EncodedString, contactJid);
+                    }
+                    catch (Exception e){
+
+                    }
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+            @Override
+            public void notifyError(JSONObject error) {
+                try {
+                    Log.d(LOGTAG,"Category updation failed");
+                    Log.d(LOGTAG,error.getString("data"));
+                    UpdateMessagePanel(message, contactJid);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+        },mApplicationContext);
+        mVolleyService.postDataVolley(POST_TRANSLATION_TEXT,data);
+    }
+    public void UpdateMessagePanel(String messageBody, String contactJid){
+        ChatMessagesModel.get(mApplicationContext).addMessage(new ChatMessage(messageBody, System.currentTimeMillis(), ChatMessage.Type.RECEIVED,contactJid));
+        if ( ContactModel.get(mApplicationContext).isContactStranger(contactJid))
+        {
+            List<com.scalability4all.sathi.model.Chat> chats = ChatModel.get(mApplicationContext).getChatsByJid(contactJid);
+            if( chats.size() == 0) {
+                Log.d(LOGTAG, contactJid + " neuer Chat, Timestamp :" + Utilities.getFormattedTime(System.currentTimeMillis()));
+                com.scalability4all.sathi.model.Chat chatRooster = new com.scalability4all.sathi.model.Chat(contactJid, messageBody, com.scalability4all.sathi.model.Chat.ContactType.ONE_ON_ONE, System.currentTimeMillis(), 0);
+                ChatModel.get(mApplicationContext).addChat(chatRooster);
+                Intent intent = new Intent(Constants.BroadCastMessages.UI_NEW_CHAT_ITEM);
+                intent.setPackage(mApplicationContext.getPackageName());
+                mApplicationContext.sendBroadcast(intent);
+            }
+        }
+        Intent intent = new Intent(Constants.BroadCastMessages.UI_NEW_MESSAGE_FLAG);
+        Log.d(LOGTAG, "package name :"+mApplicationContext.getPackageName());
+        intent.setPackage(mApplicationContext.getPackageName());
+        intent.putExtra("JabberId", contactJid);
+        mApplicationContext.sendBroadcast(intent);
+    }
     public void connect() throws IOException,XMPPException,SmackException
     {
         mConnectionState = ConnectionState.CONNECTING;
@@ -173,24 +252,8 @@ public class RoosterConnection implements ConnectionListener, SubscribeListener,
                 {
                     contactJid=messageSource;
                 }
-                ChatMessagesModel.get(mApplicationContext).addMessage(new ChatMessage(message.getBody(), System.currentTimeMillis(), ChatMessage.Type.RECEIVED,contactJid));
-                if ( ContactModel.get(mApplicationContext).isContactStranger(contactJid))
-                {
-                    List<com.scalability4all.sathi.model.Chat> chats = ChatModel.get(mApplicationContext).getChatsByJid(contactJid);
-                    if( chats.size() == 0) {
-                        Log.d(LOGTAG, contactJid + " neuer Chat, Timestamp :" + Utilities.getFormattedTime(System.currentTimeMillis()));
-                        com.scalability4all.sathi.model.Chat chatRooster = new com.scalability4all.sathi.model.Chat(contactJid, message.getBody(), com.scalability4all.sathi.model.Chat.ContactType.ONE_ON_ONE, System.currentTimeMillis(), 0);
-                        ChatModel.get(mApplicationContext).addChat(chatRooster);
-                        Intent intent = new Intent(Constants.BroadCastMessages.UI_NEW_CHAT_ITEM);
-                        intent.setPackage(mApplicationContext.getPackageName());
-                        mApplicationContext.sendBroadcast(intent);
-                    }
-                }
-                Intent intent = new Intent(Constants.BroadCastMessages.UI_NEW_MESSAGE_FLAG);
-                Log.d(LOGTAG, "package name :"+mApplicationContext.getPackageName());
-                intent.setPackage(mApplicationContext.getPackageName());
-                intent.putExtra("JabberId", contactJid);
-                mApplicationContext.sendBroadcast(intent);
+                String messageBody = message.getBody();
+                translateMessage(messageBody, contactJid);
             }
         });
         ServerPingWithAlarmManager.getInstanceFor(mConnection).setEnabled(true);
