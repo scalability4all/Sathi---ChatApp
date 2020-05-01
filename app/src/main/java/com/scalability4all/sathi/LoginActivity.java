@@ -227,7 +227,10 @@ public class LoginActivity extends AppCompatActivity{
                     Map<CharSequence, String> languages_locale = Constants.languages_locale;
 
                     for (int i=0; i<category.length(); i++) {
-                        categories.append(category.get(i)).append(",");
+                        categories.append(category.get(i));
+                        if((category.length()-1)!=i) {
+                            categories.append(",");
+                        }
                     }
                     prefs.edit()
                             .putString("language", (String) Constants.getKeyByValue(languages_locale,data.getString("language")))

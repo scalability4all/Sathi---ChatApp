@@ -29,11 +29,15 @@ import com.scalability4all.sathi.services.VolleyCallback;
 import com.scalability4all.sathi.services.VolleyService;
 import com.scalability4all.sathi.xmpp.RoosterConnectionService;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.json.JSONStringer;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -316,9 +320,25 @@ public class Register extends AppCompatActivity {
                     JSONObject errorData=new JSONObject(error.getString("errors"));
 
                     if(errorData.getString("username")!=null && errorData.getString("username").length()>0) {
-                        username.setError("Username " + errorData.getString("username"));
+                        JSONArray usernameErrors=new JSONArray(errorData.getString("username"));
+                        StringBuilder username_errors = new StringBuilder("");
+                        for (int i=0; i<usernameErrors.length(); i++) {
+                            username_errors.append(usernameErrors.get(i));
+                            if((usernameErrors.length()-1)!=i) {
+                                username_errors.append(",");
+                            }
+                        }
+                        username.setError("Username " + String.valueOf(username_errors));
                     } else if(errorData.getString("email")!=null && errorData.getString("email").length()>0) {
-                        email.setError("Email "+errorData.getString("username"));
+                        JSONArray emailErrors=new JSONArray(errorData.getString("email"));
+                        StringBuilder email_errors = new StringBuilder("");
+                        for (int i=0; i<emailErrors.length(); i++) {
+                            email_errors.append(emailErrors.get(i));
+                            if(emailErrors.length()-1!=i) {
+                                email_errors.append(",");
+                            }
+                        }
+                        email.setError("Email " + String.valueOf(email_errors));
                     } else{
                         registration_error.setText((CharSequence) errorData);
                     }
