@@ -159,7 +159,8 @@ public class ChatListActivity extends AppCompatActivity implements ChatListAdapt
             SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
             prefs.edit().clear().commit();
             try {
-
+                Intent i1 = new Intent(this, RoosterConnectionService.class);
+                stopService(i1);
                 //Register or UnRegister your broadcast receiver here
                 unregisterReceiver(mBroadcastReceiver);
             } catch(IllegalArgumentException e) {

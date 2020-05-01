@@ -141,6 +141,15 @@
                             android:gravity="center_horizontal"
                             android:text="@string/action_sign_in"
                             android:textSize="10sp" />
+
+                        <TextView android:id="@+id/link_to_register"
+                            android:layout_width="fill_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="40dip"
+                            android:layout_marginBottom="40dip"
+                            android:text="Don't have an account ? Register here"
+                            android:gravity="center"
+                            android:textColor="#0b84aa"/>
                     </LinearLayout>
 
                 </LinearLayout>

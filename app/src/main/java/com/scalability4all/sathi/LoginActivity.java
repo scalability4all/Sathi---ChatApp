@@ -41,6 +41,7 @@ import org.jxmpp.jid.parts.Localpart;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import static com.scalability4all.sathi.services.VolleyService.GET_USER_DETAILS;
 
@@ -53,7 +54,7 @@ public class LoginActivity extends AppCompatActivity{
     private View mLoginFormView;
     private BroadcastReceiver mBroadcastReceiver;
     private String serverurl = "localhost";
-
+    private TextView register;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -79,6 +80,14 @@ public class LoginActivity extends AppCompatActivity{
         });
         mLoginFormView = findViewById(R.id.login_form);
         mProgressView = findViewById(R.id.login_progress);
+        register=findViewById(R.id.link_to_register);
+        register.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent i = new Intent(LoginActivity.this,Register.class);
+                startActivity(i);
+            }
+        });
 //        ImageView mJidRegisterButton = findViewById(R.id.jid_register_button);
 //        // Registrierungsdialog
 //        mJidRegisterButton.setOnClickListener(new OnClickListener() {
@@ -215,11 +224,16 @@ public class LoginActivity extends AppCompatActivity{
                     List<CharSequence> newsCategory = new ArrayList<CharSequence>();
                     JSONArray category=new JSONArray(data.getString("category"));
                     StringBuilder categories = new StringBuilder("");
+                    Map<CharSequence, String> languages_locale = Constants.languages_locale;
+
                     for (int i=0; i<category.length(); i++) {
-                        categories.append(category.get(i)).append(",");
+                        categories.append(category.get(i));
+                        if((category.length()-1)!=i) {
+                            categories.append(",");
+                        }
                     }
                     prefs.edit()
-                            .putString("language", data.getString("language"))
+                            .putString("language", (String) Constants.getKeyByValue(languages_locale,data.getString("language")))
                             .putString("category", String.valueOf(categories))
                             .commit();
                 } catch (JSONException e) {
@@ -287,5 +301,7 @@ public class LoginActivity extends AppCompatActivity{
         };
         thread.start();
     }
+
+
 
 }
