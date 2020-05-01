@@ -30,6 +30,7 @@ public class VolleyService {
     public static String UPDATE_USER_PREFERENCE_LANGUAGE=BASE_SERVER_IP_ADDRESS+"update/user";
     public static String UPDATE_USER_PREFERENCE_CATEGORY=BASE_SERVER_IP_ADDRESS+"update/category";
     public static  String POST_TRANSLATION_TEXT=BASE_SERVER_IP_ADDRESS+"translate";
+    public static  String REGISTER_USER=BASE_SERVER_IP_ADDRESS+"user";
 
     public VolleyService(VolleyCallback resultCallback, Context  context){
         mResultCallback = resultCallback;
