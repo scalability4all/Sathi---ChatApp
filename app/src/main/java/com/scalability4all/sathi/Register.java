@@ -1,7 +1,14 @@
 package com.scalability4all.sathi;
 
+import android.annotation.TargetApi;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentFilter;
+import android.content.SharedPreferences;
+import android.os.Build;
+import android.preference.PreferenceManager;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -20,6 +27,7 @@ import android.widget.TextView;
 
 import com.scalability4all.sathi.services.VolleyCallback;
 import com.scalability4all.sathi.services.VolleyService;
+import com.scalability4all.sathi.xmpp.RoosterConnectionService;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -41,16 +49,25 @@ public class Register extends AppCompatActivity {
     EditText email;
     EditText language;
     Button register;
+    private BroadcastReceiver mBroadcastReceiver;
     TextView login;
     Timer timer;
     String emailPattern = "[a-zA-Z0-9._-]+@[a-z]+\\.+[a-z]+";
     private CharSequence[] languages ;
     private String selectedLanguage;
     Map<CharSequence, String> languages_locale;
+    View mProgressView;
+    View mregisterFormView;
+    TextView registration_error;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_register);
+
+        mProgressView = findViewById(R.id.register_progress);
+        mregisterFormView=findViewById(R.id.register_form);
+
+        registration_error=(TextView)findViewById(R.id.error_message);
 
         languages_locale=Constants.languages_locale;
 
@@ -108,6 +125,7 @@ public class Register extends AppCompatActivity {
         });
 
         email=findViewById(R.id.email);
+
 
         language=findViewById(R.id.language);
         language.setInputType(InputType.TYPE_NULL);
@@ -188,7 +206,6 @@ public class Register extends AppCompatActivity {
                     email.setError(getString(R.string.error_incorrect_gmail));
                     doNotRegister=true;
                 }
-
                 if(TextUtils.isEmpty(lng)) {
                     language.setText(getString(R.string.error_field_required));
                     doNotRegister=true;
@@ -197,9 +214,9 @@ public class Register extends AppCompatActivity {
                     confirm_password.setError(getString(R.string.passwords_not_matching));
                     doNotRegister=true;
                 }
-
                 if(!doNotRegister) {
                     register(name,pwd,mailId,lng);
+                    showProgress(true);
                 }
             }
         });
@@ -213,27 +230,99 @@ public class Register extends AppCompatActivity {
             }
         });
 
+
     }
 
     private boolean isPasswordValid(String password) {
         return password.length() > 4;
     }
 
-    private void register(String username,String password,String email,String language) {
+    @TargetApi(Build.VERSION_CODES.HONEYCOMB_MR2)
+    private void showProgress(final boolean show) {
+        mProgressView.setVisibility(show ? View.VISIBLE : View.GONE);
+        mregisterFormView.setVisibility(show ? View.GONE : View.VISIBLE);
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        try {
+
+            //Register or UnRegister your broadcast receiver here
+            unregisterReceiver(mBroadcastReceiver);
+        } catch(IllegalArgumentException e) {
+
+            e.printStackTrace();
+        }
+
+    }
+    
+    @Override
+    protected void onResume() {
+        super.onResume();
+        mBroadcastReceiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                String action = intent.getAction();
+                switch (action)
+                {
+                    case Constants.BroadCastMessages.UI_AUTHENTICATED:
+                        Log.d(LOGTAG,"Mainscreen opens\n");
+                         showProgress(false);
+                        Intent i = new Intent(getApplicationContext(),ChatListActivity.class);
+                        startActivity(i);
+                        finish();
+                        break;
+                    case Constants.BroadCastMessages.UI_CONNECTION_ERROR:
+                        Log.d(LOGTAG,"Connection Error");
+                         showProgress(false);
+                        // mJidView.setError("Login problems. Please check your details and try again.");
+                        break;
+                }
+            }
+        };
+        IntentFilter filter = new IntentFilter();
+        filter.addAction(Constants.BroadCastMessages.UI_AUTHENTICATED);
+        filter.addAction(Constants.BroadCastMessages.UI_CONNECTION_ERROR);
+        this.registerReceiver(mBroadcastReceiver, filter);
+    }
+
+    private void register(final String name, final String password, final String emailId, final String language) {
         HashMap data = new HashMap();
-        data.put("username", username);
+        data.put("username", name);
         data.put("password", password);
         data.put("language",languages_locale.get(language));
-        data.put("email",email);
+        data.put("email",emailId);
         new VolleyService(new VolleyCallback() {
             @Override
             public void notifySuccess(JSONObject response) throws JSONException {
-                    Intent i = new Intent(Register.this,LoginActivity.class);
-                    startActivity(i);
+                SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(Register.this);
+                prefs.edit()
+                        .putString("xmpp_jid", name+"@"+getString(R.string.domain))
+                        .putString("xmpp_password",password)
+                        .putString("xmpp_email",emailId)
+                        .putString("language", language)
+                        .putString("category", "")
+                        .commit();
+        
+                Intent i1 = new Intent(Register.this, RoosterConnectionService.class);
+                startService(i1);
+
             }
             @Override
             public void notifyError(JSONObject error) {
                 try {
+                    showProgress(false);
+                    JSONObject errorData=new JSONObject(error.getString("errors"));
+
+                    if(errorData.getString("username")!=null && errorData.getString("username").length()>0) {
+                        username.setError("Username " + errorData.getString("username"));
+                    } else if(errorData.getString("email")!=null && errorData.getString("email").length()>0) {
+                        email.setError("Email "+errorData.getString("username"));
+                    } else{
+                        registration_error.setText((CharSequence) errorData);
+                    }
+
                     Log.d(LOGTAG,"Unable to register");
                     Log.d(LOGTAG,error.getString("data"));
                 } catch (JSONException e) {
