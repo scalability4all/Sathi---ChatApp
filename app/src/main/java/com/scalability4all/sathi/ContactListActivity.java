@@ -43,7 +43,6 @@ public class ContactListActivity extends AppCompatActivity implements ContactLis
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         FloatingActionButton newContactButton = findViewById(R.id.new_contact_button);
-        newContactButton.setBackgroundTintList(getResources().getColorStateList(R.color.colorPrimary));
         newContactButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {

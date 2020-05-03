@@ -146,7 +146,7 @@ class ChatMessageViewHolder extends RecyclerView.ViewHolder{
         mChatMessage = chatMessage;
         mMessageBody.setText(chatMessage.getMessage());
         mMessageTimestamp.setText(Utilities.getFormattedTime(chatMessage.getTimestamp()));
-        profileImage.setImageResource(R.drawable.ic_profile);
+        profileImage.setImageResource(R.mipmap.ic_profile);
         ChatMessage.Type type = mChatMessage.getType();
         if( type == ChatMessage.Type.RECEIVED)
         {

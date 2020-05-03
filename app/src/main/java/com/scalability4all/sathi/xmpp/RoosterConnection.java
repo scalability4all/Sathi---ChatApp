@@ -689,7 +689,7 @@ public class RoosterConnection implements ConnectionListener, SubscribeListener,
         if( jid != null)
         {
             mUsername = jid.split("@")[0];
-            mServiceName = jid.split("@")[1];
+            mServiceName = jid.split("@").length>1?jid.split("@")[1]:"";
         }else
         {
             mUsername ="";
