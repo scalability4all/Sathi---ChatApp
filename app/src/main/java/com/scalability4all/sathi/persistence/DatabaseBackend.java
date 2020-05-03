@@ -18,7 +18,7 @@ public class DatabaseBackend extends SQLiteOpenHelper {
     private static String CREATE_CHAT_LIST_STATEMENT = "create table "
             + Chat.TABLE_NAME + "("
             + Chat.Cols.CHAT_UNIQUE_ID +" INTEGER PRIMARY KEY AUTOINCREMENT,"
-            + Chat.Cols.CONTACT_TYPE + " TEXT, " + Chat.Cols.CONTACT_JID + " TEXT,"
+            + Chat.Cols.CONTACT_TYPE + " TEXT, " + Chat.Cols.TO_CONTACT_JID + " TEXT,"+  Chat.Cols.FROM_CONTACT_JID + " TEXT,"
             + Chat.Cols.LAST_MESSAGE + " TEXT, " + Chat.Cols.UNREAD_COUNT + " NUMBER,"
             + Chat.Cols.LAST_MESSAGE_TIME_STAMP + " NUMBER"
             + ");";
@@ -39,7 +39,8 @@ public class DatabaseBackend extends SQLiteOpenHelper {
             + ChatMessage.Cols.MESSAGE + " TEXT, "
             + ChatMessage.Cols.MESSAGE_TYPE + " TEXT, "
             + ChatMessage.Cols.TIMESTAMP + " NUMBER, "
-            + ChatMessage.Cols.CONTACT_JID + " TEXT"
+            + ChatMessage.Cols.TO_CONTACT_JID + " TEXT,"
+            + ChatMessage.Cols.FROM_CONTACT_JID + " TEXT"
             + ");";
 
     private DatabaseBackend(Context context) {

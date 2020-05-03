@@ -2,7 +2,10 @@ package com.scalability4all.sathi;
 
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
+
 import android.text.InputType;
 import android.util.Log;
 import android.view.Gravity;
@@ -88,11 +91,15 @@ public class ContactListActivity extends AppCompatActivity implements ContactLis
     @Override
     public void onItemClick(String contactJid) {
         Log.d(LOGTAG,"Geklickter Kontakt: "+contactJid);
-        List<Chat> chats = ChatModel.get(getApplicationContext()).getChatsByJid(contactJid);
+        final SharedPreferences prefs= PreferenceManager.getDefaultSharedPreferences(ContactListActivity.this);
+        String username=prefs.getString("xmpp_jid",null);
+
+        List<Chat> chats = ChatModel.get(getApplicationContext()).getChatsByJid(contactJid,username);
         if( chats.size() == 0)
         {
             Log.d(LOGTAG, contactJid + " neuer Chat. Timestamp :"+ Utilities.getFormattedTime(System.currentTimeMillis()));
-            Chat chat = new Chat(contactJid,"",Chat.ContactType.ONE_ON_ONE, System.currentTimeMillis(),0);
+
+            Chat chat = new Chat(contactJid,username,"",Chat.ContactType.ONE_ON_ONE, System.currentTimeMillis(),0);
             ChatModel.get(getApplicationContext()).addChat(chat);
             Intent intent = new Intent(ContactListActivity.this,ChatViewActivity.class);
             intent.putExtra("contact_jid",contactJid);

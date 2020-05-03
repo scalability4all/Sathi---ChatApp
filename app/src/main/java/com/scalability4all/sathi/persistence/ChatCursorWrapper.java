@@ -13,7 +13,8 @@ public class ChatCursorWrapper extends CursorWrapper {
         super(cursor);
     }
     public Chat getChat() {
-        String jid = getString(getColumnIndex(Chat.Cols.CONTACT_JID));
+        String jid = getString(getColumnIndex(Chat.Cols.TO_CONTACT_JID));
+        String sendersJid = getString(getColumnIndex(Chat.Cols.FROM_CONTACT_JID));
         String contactType = getString(getColumnIndex(Chat.Cols.CONTACT_TYPE));
         String lastMessage = getString(getColumnIndex(Chat.Cols.LAST_MESSAGE));
         long unreadCount = getLong(getColumnIndex(Chat.Cols.UNREAD_COUNT));
@@ -29,7 +30,7 @@ public class ChatCursorWrapper extends CursorWrapper {
         {
             chatType = Chat.ContactType.STRANGER;
         }
-        Chat chat = new Chat(jid,lastMessage,chatType, lastMessageTimeStamp,unreadCount);
+        Chat chat = new Chat(jid,sendersJid,lastMessage,chatType, lastMessageTimeStamp,unreadCount);
         chat.setPersistID(uniqueId);
         return chat;
     }

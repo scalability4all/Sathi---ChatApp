@@ -6,13 +6,11 @@ import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.preference.PreferenceManager;
-import android.sax.EndElementListener;
 import android.util.Log;
 
 
 import com.scalability4all.sathi.Constants;
 import com.scalability4all.sathi.R;
-import com.scalability4all.sathi.Settings;
 import com.scalability4all.sathi.Utilities;
 import com.scalability4all.sathi.model.ChatMessage;
 import com.scalability4all.sathi.model.ChatMessagesModel;
@@ -44,7 +42,6 @@ import org.jivesoftware.smackx.ping.PingManager;
 import org.jivesoftware.smackx.ping.android.ServerPingWithAlarmManager;
 import org.jivesoftware.smackx.vcardtemp.VCardManager;
 import org.jivesoftware.smackx.vcardtemp.packet.VCard;
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.jxmpp.jid.EntityBareJid;
@@ -56,8 +53,6 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.InetAddress;
-import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
@@ -158,7 +153,7 @@ public class RoosterConnection implements ConnectionListener, SubscribeListener,
                         Log.d(LOGTAG, EncodedString);
                         Log.d(LOGTAG, "मस्ते");
                         //EncodedString = "मस्ते";
-                        UpdateMessagePanel(EncodedString, contactJid);
+                        UpdateMessagePanel(EncodedString, contactJid,prefs.getString("xmpp_jid",null));
                     }
                     catch (Exception e){
 
@@ -172,7 +167,7 @@ public class RoosterConnection implements ConnectionListener, SubscribeListener,
                 try {
                     Log.d(LOGTAG,"Category updation failed");
                     Log.d(LOGTAG,error.getString("data"));
-                    UpdateMessagePanel(message, contactJid);
+                    UpdateMessagePanel(message, contactJid,prefs.getString("xmpp_jid",null));
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
@@ -180,14 +175,14 @@ public class RoosterConnection implements ConnectionListener, SubscribeListener,
         },mApplicationContext);
         mVolleyService.postDataVolley(POST_TRANSLATION_TEXT,data);
     }
-    public void UpdateMessagePanel(String messageBody, String contactJid){
-        ChatMessagesModel.get(mApplicationContext).addMessage(new ChatMessage(messageBody, System.currentTimeMillis(), ChatMessage.Type.RECEIVED,contactJid));
+    public void UpdateMessagePanel(String messageBody, String contactJid,String fromContactJid){
+        ChatMessagesModel.get(mApplicationContext).addMessage(new ChatMessage(messageBody, System.currentTimeMillis(), ChatMessage.Type.RECEIVED,contactJid,fromContactJid));
         if ( ContactModel.get(mApplicationContext).isContactStranger(contactJid))
         {
-            List<com.scalability4all.sathi.model.Chat> chats = ChatModel.get(mApplicationContext).getChatsByJid(contactJid);
+            List<com.scalability4all.sathi.model.Chat> chats = ChatModel.get(mApplicationContext).getChatsByJid(contactJid,fromContactJid);
             if( chats.size() == 0) {
                 Log.d(LOGTAG, contactJid + " neuer Chat, Timestamp :" + Utilities.getFormattedTime(System.currentTimeMillis()));
-                com.scalability4all.sathi.model.Chat chatRooster = new com.scalability4all.sathi.model.Chat(contactJid, messageBody, com.scalability4all.sathi.model.Chat.ContactType.ONE_ON_ONE, System.currentTimeMillis(), 0);
+                com.scalability4all.sathi.model.Chat chatRooster = new com.scalability4all.sathi.model.Chat(contactJid,fromContactJid, messageBody, com.scalability4all.sathi.model.Chat.ContactType.ONE_ON_ONE, System.currentTimeMillis(), 0);
                 ChatModel.get(mApplicationContext).addChat(chatRooster);
                 Intent intent = new Intent(Constants.BroadCastMessages.UI_NEW_CHAT_ITEM);
                 intent.setPackage(mApplicationContext.getPackageName());
@@ -503,7 +498,7 @@ public class RoosterConnection implements ConnectionListener, SubscribeListener,
             mConnection.disconnect();
         }
     }
-    public void sendMessage (String body , String toJid)
+    public void sendMessage (String body , String toJid, String fromJid)
     {
         Log.d(LOGTAG,"Nachricht wird gesendet zu: :"+ toJid);
         EntityBareJid jid = null;
@@ -517,7 +512,7 @@ public class RoosterConnection implements ConnectionListener, SubscribeListener,
             Message message = new Message(jid, Message.Type.chat);
             message.setBody(body);
             chat.send(message);
-            ChatMessagesModel.get(mApplicationContext).addMessage(new ChatMessage(body, System.currentTimeMillis(), ChatMessage.Type.SENT,toJid));
+            ChatMessagesModel.get(mApplicationContext).addMessage(new ChatMessage(body, System.currentTimeMillis(), ChatMessage.Type.SENT,toJid,fromJid));
         } catch (SmackException.NotConnectedException e) {
             e.printStackTrace();
         } catch (InterruptedException e) {
@@ -758,6 +753,8 @@ public class RoosterConnection implements ConnectionListener, SubscribeListener,
     }
     @Override
     public SubscribeAnswer processSubscribe(Jid from, Presence subscribeRequest) {
+        final SharedPreferences prefs=PreferenceManager.getDefaultSharedPreferences(mApplicationContext);
+        String username=prefs.getString("xmpp_jid",null);
         if(!ContactModel.get(mApplicationContext).isContactStranger(from.toString()))
         {
             Log.d(LOGTAG,"Kontakt kein Unbekannter");
@@ -765,9 +762,9 @@ public class RoosterConnection implements ConnectionListener, SubscribeListener,
             mContact.setPendingFrom(true);
             ContactModel.get(mApplicationContext).updateContactSubscription(mContact);
         }else {
-            List<com.scalability4all.sathi.model.Chat> chats = ChatModel.get(mApplicationContext).getChatsByJid(from.toString());
+            List<com.scalability4all.sathi.model.Chat> chats = ChatModel.get(mApplicationContext).getChatsByJid(from.toString(),username);
             if( chats.size() == 0) {
-                if(ChatModel.get(mApplicationContext).addChat(new com.scalability4all.sathi.model.Chat(from.toString(),"Subscription Request",STRANGER,
+                if(ChatModel.get(mApplicationContext).addChat(new com.scalability4all.sathi.model.Chat(from.toString(),username,"Subscription Request",STRANGER,
                         System.currentTimeMillis(),1)))
                 {
                     Log.d(LOGTAG,"Chat für unbekannten "+from.toString() + " hinzugefügt");

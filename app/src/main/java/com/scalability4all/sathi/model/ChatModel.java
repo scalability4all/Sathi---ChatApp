@@ -28,10 +28,10 @@ public class ChatModel {
         mContext = context;
         mDatabase = DatabaseBackend.getInstance(mContext).getWritableDatabase();
     }
-    public List<Chat> getChats()
+    public List<Chat> getChats(String jid)
     {
         List<Chat> chats = new ArrayList<>();
-        ChatCursorWrapper cursor = queryChats(null,null);
+        ChatCursorWrapper cursor = queryChats("(toContactJid= ? or fromContactJid= ?)",new String[] {jid,jid});
         try
         {
             cursor.moveToFirst();
@@ -46,10 +46,31 @@ public class ChatModel {
         }
         return chats;
     }
-    public List<Chat> getChatsByJid(String jid)
+
+    public List<Chat> getTimeStamp(String jid)
     {
         List<Chat> chats = new ArrayList<>();
-        ChatCursorWrapper cursor = queryChats(Chat.Cols.CONTACT_JID + "= ?",new String[] {jid});
+        ChatCursorWrapper cursor = queryChats("toContactJid= ? or fromContactJid= ?",new String[] {jid,jid});
+        try
+        {
+            cursor.moveToFirst();
+            while( !cursor.isAfterLast())
+            {
+                Log.d(LOGTAG , "Chat aus DB : Timestamp :"+cursor.getChat().getLastMessageTimeStamp());
+                chats.add(cursor.getChat());
+                cursor.moveToNext();
+            }
+        }finally {
+            cursor.close();
+        }
+        return chats;
+    }
+
+
+    public List<Chat> getChatsByJid(String toJid,String fromJid)
+    {
+        List<Chat> chats = new ArrayList<>();
+        ChatCursorWrapper cursor = queryChats("(toContactJid= ? and fromContactJid= ?) or (fromContactJid= ? and toContactJid= ?)",new String[] {toJid,fromJid,fromJid,toJid});
         try
         {
             cursor.moveToFirst();
@@ -76,7 +97,7 @@ public class ChatModel {
     }
     public boolean updateLastMessageDetails(ChatMessage chatMessage)
     {
-        List<Chat> chats = getChatsByJid(chatMessage.getContactJid());
+        List<Chat> chats = getChatsByJid(chatMessage.getToContactJid(),chatMessage.getFromContactJid());
         if( !chats.isEmpty())
         {
             Chat chat = chats.get(0);
