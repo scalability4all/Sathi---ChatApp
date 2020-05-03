@@ -3,7 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/cardview_light_background"
+    android:background="@color/white"
     android:gravity="center_vertical|center_horizontal"
     android:orientation="vertical"
     android:paddingBottom="@dimen/activity_vertical_margin"
@@ -24,139 +24,99 @@
     <ScrollView
         android:id="@+id/login_form"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
         android:foregroundGravity="center_vertical">
 
-        <RelativeLayout
+        <LinearLayout
+            android:id="@+id/jid_login_form"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:clipChildren="false"
+            android:clipToPadding="false"
+            android:orientation="vertical"
+            android:padding="24dp"
+            android:paddingTop="16dp">
 
-            <LinearLayout
-                android:id="@+id/jid_login_form"
+            <ImageView
+                android:layout_width="236dp"
+                android:layout_height="113dp"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginTop="68dp"
+                android:layout_marginBottom="10dp"
+                app:srcCompat="@drawable/logo" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginBottom="110dp"
+                android:text="@string/app_name"
+                android:textAllCaps="true"
+                android:textSize="16sp" />
+
+
+            <com.google.android.material.textfield.TextInputLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical">
+                android:layout_margin="4dp">
 
-               <!-- <ImageView
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/jid"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginBottom="15dp"
-                    app:srcCompat="@drawable/unichat" />-->
+                    android:hint="@string/hint_user_name"
+                    android:inputType="text"
+                    android:maxLines="1" />
 
-                <com.google.android.material.textfield.TextInputLayout
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="4dp">
+
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/password"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content">
+                    android:layout_height="wrap_content"
+                    android:hint="@string/prompt_password"
+                    android:imeActionId="6"
+                    android:imeActionLabel="@string/action_sign_in_short"
+                    android:imeOptions="actionUnspecified"
+                    android:inputType="textPassword"
+                    android:maxLines="1" />
 
-                    <AutoCompleteTextView
-                        android:id="@+id/jid"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginEnd="50dp"
-                        android:layout_marginStart="50dp"
-                        android:gravity="center_horizontal"
-                        android:hint="@string/prompt_jid"
-                        android:inputType="textEmailAddress"
-                        android:maxLines="1"
-                        android:singleLine="true"
-                        android:textSize="12sp" />
+            </com.google.android.material.textfield.TextInputLayout>
 
-                </com.google.android.material.textfield.TextInputLayout>
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
 
-                <com.google.android.material.textfield.TextInputLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content">
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/jid_sign_in_button"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentEnd="true"
+                    android:layout_alignParentRight="true"
+                    android:text="@string/action_sign_in"
+                    app:errorEnabled="true" />
 
-                    <EditText
-                        android:id="@+id/password"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginEnd="50dp"
-                        android:layout_marginStart="50dp"
-                        android:gravity="center_horizontal"
-                        android:hint="@string/prompt_password"
-                        android:imeActionId="6"
-                        android:imeActionLabel="@string/action_sign_in_short"
-                        android:imeOptions="actionUnspecified"
-                        android:inputType="textPassword"
-                        android:maxLines="1"
-                        android:singleLine="true"
-                        android:textSize="12sp" />
+                <TextView
+                    android:id="@+id/link_to_register"
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dip"
+                    android:layout_toStartOf="@id/jid_sign_in_button"
+                    android:layout_toLeftOf="@id/jid_sign_in_button"
+                    android:gravity="center"
+                    android:text="Don't have an account ? Register here"
+                    android:textColor="#0b84aa" />
 
-                </com.google.android.material.textfield.TextInputLayout>
+            </RelativeLayout>
 
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:layout_marginEnd="50dp"
-                    android:layout_marginStart="50dp"
-                    android:layout_marginTop="10dp"
-                    android:orientation="horizontal">
 
-               <!--     <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:layout_weight="1"
-                        android:gravity="center_horizontal"
-                        android:orientation="vertical">
-
-                        <ImageView
-                            android:id="@+id/jid_register_button"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_centerInParent="true"
-                            android:layout_weight="1"
-                            android:background="@drawable/imageview_border"
-                            app:srcCompat="@mipmap/ic_launcher_pummel_round" />
-
-                        <TextView
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:gravity="center_horizontal"
-                            android:text="@string/action_register"
-                            android:textSize="10sp" />
-
-                    </LinearLayout>-->
-
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:orientation="vertical"
-                        android:layout_weight="1">
-
-                        <ImageView
-                            android:id="@+id/jid_sign_in_button"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_centerInParent="true"
-                            android:layout_gravity="center_horizontal"
-                            android:layout_weight="1"
-                            android:background="@drawable/imageview_border"
-                            app:srcCompat="@mipmap/ic_launcher_unicorn" />
-
-                        <TextView
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:gravity="center_horizontal"
-                            android:text="@string/action_sign_in"
-                            android:textSize="10sp" />
-
-                        <TextView android:id="@+id/link_to_register"
-                            android:layout_width="fill_parent"
-                            android:layout_height="wrap_content"
-                            android:layout_marginTop="40dip"
-                            android:layout_marginBottom="40dip"
-                            android:text="Don't have an account ? Register here"
-                            android:gravity="center"
-                            android:textColor="#0b84aa"/>
-                    </LinearLayout>
-
-                </LinearLayout>
-
-            </LinearLayout>
-
-        </RelativeLayout>
+        </LinearLayout>
     </ScrollView>
 
 </LinearLayout>

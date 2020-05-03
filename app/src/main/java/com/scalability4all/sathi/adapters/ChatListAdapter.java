@@ -139,7 +139,7 @@ class ChatHolder extends RecyclerView.ViewHolder{
         timestampTextView.setMovementMethod(LinkMovementMethod.getInstance());
         timestampTextView.setText(Utilities.getFormattedTime(mChat.getLastMessageTimeStamp()));
 
-        profileImage.setImageResource(R.drawable.ic_profile);
+        profileImage.setImageResource(R.mipmap.ic_profile);
         RoosterConnection rc = RoosterConnectionService.getConnection();
         if(rc != null)
         {

@@ -96,7 +96,6 @@ public class ChatListActivity extends AppCompatActivity implements ChatListAdapt
         mAdapter.setOnItemLongClickListener(this);
         chatsRecyclerView.setAdapter(mAdapter);
         FloatingActionButton newConversationButton = findViewById(R.id.new_conversation_floating_button);
-        newConversationButton.setBackgroundTintList(getResources().getColorStateList(R.color.colorPrimary));
         newConversationButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
