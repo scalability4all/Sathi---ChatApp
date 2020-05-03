@@ -98,7 +98,6 @@ public class ChatListAdapter extends RecyclerView.Adapter<ChatHolder> {
         chatholder = new ChatHolder(view,this, mContext);
         return chatholder;
     }
-    @RequiresApi(api = Build.VERSION_CODES.N)
     @Override
     public void onBindViewHolder(ChatHolder holder, int position) {
         Chat chat = chatList.get(position);
@@ -112,7 +111,6 @@ public class ChatListAdapter extends RecyclerView.Adapter<ChatHolder> {
         chatList = ChatModel.get(mContext).getChats(selfJid);
         notifyDataSetChanged();
     }
-    @RequiresApi(api = Build.VERSION_CODES.N)
     public void OnNewMessage(String user) {
         chatList = ChatModel.get(mContext).getChats(selfJid);
         notifyDataSetChanged();
@@ -166,7 +164,6 @@ class ChatHolder extends RecyclerView.ViewHolder{
             }
         });
     }
-    @RequiresApi(api = Build.VERSION_CODES.N)
     public void bindChat(Chat chat)
     {
         mChat = chat;
