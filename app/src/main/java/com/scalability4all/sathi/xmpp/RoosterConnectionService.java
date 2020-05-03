@@ -6,8 +6,9 @@ import android.os.Handler;
 import android.os.IBinder;
 import android.os.Looper;
 import android.preference.PreferenceManager;
-import android.support.annotation.Nullable;
 import android.util.Log;
+
+import androidx.annotation.Nullable;
 
 import com.scalability4all.sathi.Constants;
 

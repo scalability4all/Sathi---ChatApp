@@ -10,13 +10,6 @@ import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-import android.support.design.widget.FloatingActionButton;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.ContextCompat;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.PopupMenu;
-import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.Menu;
@@ -31,6 +24,14 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.PopupMenu;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.scalability4all.sathi.adapters.ChatListAdapter;
 import com.scalability4all.sathi.model.Chat;
 import com.scalability4all.sathi.model.ChatModel;

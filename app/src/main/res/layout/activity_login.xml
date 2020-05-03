@@ -43,7 +43,7 @@
                     android:layout_marginBottom="15dp"
                     app:srcCompat="@drawable/unichat" />-->
 
-                <android.support.design.widget.TextInputLayout
+                <com.google.android.material.textfield.TextInputLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content">
 
@@ -60,9 +60,9 @@
                         android:singleLine="true"
                         android:textSize="12sp" />
 
-                </android.support.design.widget.TextInputLayout>
+                </com.google.android.material.textfield.TextInputLayout>
 
-                <android.support.design.widget.TextInputLayout
+                <com.google.android.material.textfield.TextInputLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content">
 
@@ -82,7 +82,7 @@
                         android:singleLine="true"
                         android:textSize="12sp" />
 
-                </android.support.design.widget.TextInputLayout>
+                </com.google.android.material.textfield.TextInputLayout>
 
                 <LinearLayout
                     android:layout_width="match_parent"

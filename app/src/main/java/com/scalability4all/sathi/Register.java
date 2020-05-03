@@ -9,8 +9,6 @@ import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.os.Build;
 import android.preference.PreferenceManager;
-import android.support.v7.app.AlertDialog;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.InputType;
@@ -24,6 +22,9 @@ import android.view.inputmethod.EditorInfo;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
+
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
 
 import com.scalability4all.sathi.services.VolleyCallback;
 import com.scalability4all.sathi.services.VolleyService;
