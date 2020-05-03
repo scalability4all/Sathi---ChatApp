@@ -16,7 +16,8 @@ public class ChatMessageCursorWrapper extends CursorWrapper {
         String message = getString(getColumnIndex(ChatMessage.Cols.MESSAGE));
         long timestamp = getLong(getColumnIndex(ChatMessage.Cols.TIMESTAMP));
         String messageType = getString(getColumnIndex(ChatMessage.Cols.MESSAGE_TYPE));
-        String counterpartJid = getString(getColumnIndex(ChatMessage.Cols.CONTACT_JID));
+        String counterpartJid = getString(getColumnIndex(ChatMessage.Cols.TO_CONTACT_JID));
+        String sendersJid = getString(getColumnIndex(ChatMessage.Cols.FROM_CONTACT_JID));
         int uniqueId = getInt(getColumnIndex(ChatMessage.Cols.CHAT_MESSAGE_UNIQUE_ID));
         ChatMessage.Type chatMessageType = null;
         if( messageType.equals("SENT"))
@@ -27,7 +28,7 @@ public class ChatMessageCursorWrapper extends CursorWrapper {
         {
             chatMessageType = ChatMessage.Type.RECEIVED;
         }
-        ChatMessage chatMessage = new ChatMessage(message,timestamp,chatMessageType,counterpartJid);
+        ChatMessage chatMessage = new ChatMessage(message,timestamp,chatMessageType,counterpartJid,sendersJid);
         chatMessage.setPersistID(uniqueId);
         return  chatMessage;
     }
