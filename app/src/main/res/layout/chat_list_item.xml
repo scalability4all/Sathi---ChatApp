@@ -43,7 +43,7 @@
                 android:textSize="@dimen/default_message_chat_text_size"
                 tools:text="@string/server_text" />
 
-            <android.support.v4.widget.Space
+            <androidx.legacy.widget.Space
                 android:layout_width="match_parent"
                 android:layout_height="4dp" />
 
@@ -53,7 +53,7 @@
                 android:layout_height="wrap_content"
                 android:text="@string/last_message" />
 
-            <android.support.v4.widget.Space
+            <androidx.legacy.widget.Space
                 android:layout_width="match_parent"
                 android:layout_height="4dp" />
 
