@@ -1,8 +1,10 @@
 package com.scalability4all.sathi.adapters;
 
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.drawable.Drawable;
 import android.preference.PreferenceManager;
+import android.text.util.Linkify;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.text.method.LinkMovementMethod;
@@ -124,11 +126,16 @@ class ChatMessageViewHolder extends RecyclerView.ViewHolder{
     private ChatMessagesAdapter mAdapter;
     public ChatMessageViewHolder(final View itemView, final ChatMessagesAdapter mAdapter) {
         super(itemView);
+        Intent viewIntent = new Intent(Intent.ACTION_VIEW);
+        viewIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        //mAdapter.getContext().startActivity();
         mMessageBody = itemView.findViewById(R.id.text_message_body);
         mMessageBody.setMovementMethod(LinkMovementMethod.getInstance());
+        Linkify.addLinks(mMessageBody , Linkify.WEB_URLS);
         mMessageTimestamp = itemView.findViewById(R.id.text_message_timestamp);
         profileImage = itemView.findViewById(R.id.profile);
         this.mAdapter = mAdapter;
+        //itemView.getContext().startActivity(viewIntent);
         itemView.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View v) {

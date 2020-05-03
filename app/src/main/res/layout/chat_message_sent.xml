@@ -47,6 +47,7 @@
                     tools:text="Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. "
                     android:textSize="@dimen/default_message_text_size"
                     android:linksClickable="true"
+                    android:autoLink="web"
                     android:textColor="@color/default_message_color_send"
                     android:gravity="center_vertical|start"
                     android:layout_width="wrap_content"
