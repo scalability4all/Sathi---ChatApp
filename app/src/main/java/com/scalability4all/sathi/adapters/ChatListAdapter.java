@@ -4,8 +4,6 @@ import android.content.Context;
 import android.content.res.Resources;
 import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
-import android.support.v4.content.res.ResourcesCompat;
-import android.support.v7.widget.RecyclerView;
 import android.text.Html;
 import android.text.TextUtils;
 import android.util.Log;
@@ -14,6 +12,10 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+
+import androidx.core.content.res.ResourcesCompat;
+import androidx.recyclerview.widget.RecyclerView;
+
 import com.scalability4all.sathi.R;
 import com.scalability4all.sathi.Utilities;
 import com.scalability4all.sathi.model.Chat;

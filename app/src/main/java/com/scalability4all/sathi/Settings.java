@@ -3,8 +3,6 @@ package com.scalability4all.sathi;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
-import android.support.v7.app.AlertDialog;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.InputType;
 import android.util.Log;
@@ -12,6 +10,9 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
 
 import com.scalability4all.sathi.services.VolleyCallback;
 import com.scalability4all.sathi.services.VolleyService;
@@ -30,7 +31,7 @@ import java.util.Objects;
 import static com.scalability4all.sathi.services.VolleyService.UPDATE_USER_PREFERENCE_CATEGORY;
 import static com.scalability4all.sathi.services.VolleyService.UPDATE_USER_PREFERENCE_LANGUAGE;
 
-public class Settings extends AppCompatActivity  {
+public class Settings extends AppCompatActivity {
     private static final String LOGTAG = "Settings";
     private String languageSelected;
     private String[] newsCategoriesSelected;
