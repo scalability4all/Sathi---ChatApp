@@ -87,22 +87,22 @@ public class ChatListActivity extends AppCompatActivity implements ChatListAdapt
             } else {
                 Log.d(LOGTAG, "Service is running");
             }
+            RecyclerView chatsRecyclerView = findViewById(R.id.chatsRecyclerView);
+            chatsRecyclerView.setLayoutManager(new LinearLayoutManager(getBaseContext()));
+            mAdapter = new ChatListAdapter(getApplicationContext());
+            mAdapter.setmOnItemClickListener(this);
+            mAdapter.setOnItemLongClickListener(this);
+            chatsRecyclerView.setAdapter(mAdapter);
+            FloatingActionButton newConversationButton = findViewById(R.id.new_conversation_floating_button);
+            newConversationButton.setBackgroundTintList(getResources().getColorStateList(R.color.colorPrimary));
+            newConversationButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Intent i = new Intent(ChatListActivity.this, ContactListActivity.class);
+                    startActivity(i);
+                }
+            });
         }
-        RecyclerView chatsRecyclerView = findViewById(R.id.chatsRecyclerView);
-        chatsRecyclerView.setLayoutManager(new LinearLayoutManager(getBaseContext()));
-        mAdapter = new ChatListAdapter(getApplicationContext());
-        mAdapter.setmOnItemClickListener(this);
-        mAdapter.setOnItemLongClickListener(this);
-        chatsRecyclerView.setAdapter(mAdapter);
-        FloatingActionButton newConversationButton = findViewById(R.id.new_conversation_floating_button);
-        newConversationButton.setBackgroundTintList(getResources().getColorStateList(R.color.colorPrimary));
-        newConversationButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent i = new Intent(ChatListActivity.this, ContactListActivity.class);
-                startActivity(i);
-            }
-        });
     }
 
     @Override

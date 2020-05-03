@@ -51,17 +51,23 @@ public class ChatViewActivity extends AppCompatActivity implements ChatMessagesA
     private View snackbar;
     private static final int SPEECH_REQUEST_CODE = 10;
     private View snackbarStranger;
+    private String username;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_chat_view);
+
+
+        SharedPreferences sh=PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+        username=sh.getString("xmpp_jid",null);
+
         Intent intent = getIntent();
         counterpartJid = intent.getStringExtra("contact_jid");
         Chat.ContactType chatType = (Chat.ContactType)intent.getSerializableExtra("chat_type");
         setTitle(counterpartJid);
         chatMessagesRecyclerView = findViewById(R.id.chatMessagesRecyclerView);
         chatMessagesRecyclerView.setLayoutManager(new LinearLayoutManager(getBaseContext()));
-        adapter = new ChatMessagesAdapter(getApplicationContext(),counterpartJid);
+        adapter = new ChatMessagesAdapter(getApplicationContext(),counterpartJid,username);
         adapter.setmOnInformRecyclerViewToScrollDownListener(this);
         adapter.setOnItemLongClickListener(this);
         chatMessagesRecyclerView.setAdapter(adapter);
@@ -114,7 +120,7 @@ public class ChatViewActivity extends AppCompatActivity implements ChatMessagesA
             @Override
             public void onClick(View v) {
                 if(!textSendEditText.getText().toString().equals("")){
-                    RoosterConnectionService.getConnection().sendMessage(textSendEditText.getText().toString(),counterpartJid);
+                    RoosterConnectionService.getConnection().sendMessage(textSendEditText.getText().toString(),counterpartJid,username);
                     adapter.onMessageAdd();
                     textSendEditText.getText().clear();
                 }

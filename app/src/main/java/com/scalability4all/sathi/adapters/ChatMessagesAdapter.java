@@ -31,7 +31,17 @@ public class ChatMessagesAdapter extends RecyclerView.Adapter<ChatMessageViewHol
     private List<ChatMessage> mChatMessageList;
     private LayoutInflater mLayoutInflater;
     private Context mContext;
-    private String contactJid;
+    private String toContactJid;
+
+    public String getFromContactJid() {
+        return fromContactJid;
+    }
+
+    public void setFromContactJid(String fromContactJid) {
+        this.fromContactJid = fromContactJid;
+    }
+
+    private String fromContactJid;
     private OnInformRecyclerViewToScrollDownListener mOnInformRecyclerViewToScrollDownListener;
     private OnItemLongClickListener onItemLongClickListener;
     public void setmOnInformRecyclerViewToScrollDownListener(OnInformRecyclerViewToScrollDownListener mOnInformRecyclerViewToScrollDownListener) {
@@ -49,13 +59,14 @@ public class ChatMessagesAdapter extends RecyclerView.Adapter<ChatMessageViewHol
     public void setContext(Context mContext) {
         this.mContext = mContext;
     }
-    public ChatMessagesAdapter(Context context, String contactJid)
+    public ChatMessagesAdapter(Context context, String toContactJid,String fromContactJid)
     {
         this.mLayoutInflater = LayoutInflater.from(context);
         this.mContext = context;
-        this.contactJid = contactJid;
-        mChatMessageList = ChatMessagesModel.get(context).getMessages(contactJid);
-        Log.d(LOGTAG,"Getting messages for :"+ contactJid);
+        this.toContactJid = toContactJid;
+        this.fromContactJid=fromContactJid;
+        mChatMessageList = ChatMessagesModel.get(context).getMessages(toContactJid,fromContactJid);
+        Log.d(LOGTAG,"Getting messages for :"+ toContactJid);
     }
     public void informRecyclerViewToScrollDown()
     {
@@ -97,7 +108,7 @@ public class ChatMessagesAdapter extends RecyclerView.Adapter<ChatMessageViewHol
         }
     }
     public void onMessageAdd() {
-        mChatMessageList = ChatMessagesModel.get(mContext).getMessages(contactJid);
+        mChatMessageList = ChatMessagesModel.get(mContext).getMessages(toContactJid,fromContactJid);
         notifyDataSetChanged();
         informRecyclerViewToScrollDown();
     }
@@ -138,7 +149,7 @@ class ChatMessageViewHolder extends RecyclerView.ViewHolder{
             RoosterConnection rc = RoosterConnectionService.getConnection();
             if(rc != null)
             {
-                String imageAbsPath = rc.getProfileImageAbsolutePath(mChatMessage.getContactJid());
+                String imageAbsPath = rc.getProfileImageAbsolutePath(mChatMessage.getToContactJid());
                 if ( imageAbsPath != null)
                 {
                     Drawable d = Drawable.createFromPath(imageAbsPath);

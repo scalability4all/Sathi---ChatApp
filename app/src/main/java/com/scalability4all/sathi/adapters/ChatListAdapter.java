@@ -1,9 +1,13 @@
 package com.scalability4all.sathi.adapters;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
+import android.os.Build;
+import android.preference.PreferenceManager;
+import android.support.annotation.RequiresApi;
 import android.support.v4.content.res.ResourcesCompat;
 import android.support.v7.widget.RecyclerView;
 import android.text.Html;
@@ -20,7 +24,11 @@ import com.scalability4all.sathi.model.Chat;
 import com.scalability4all.sathi.model.ChatModel;
 import com.scalability4all.sathi.xmpp.RoosterConnection;
 import com.scalability4all.sathi.xmpp.RoosterConnectionService;
+
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class ChatListAdapter extends RecyclerView.Adapter<ChatHolder> {
     private static final String LOGTAG ="ChatListAdapter";
@@ -35,10 +43,41 @@ public class ChatListAdapter extends RecyclerView.Adapter<ChatHolder> {
     private OnItemLongClickListener onItemLongClickListener;
     private Context mContext;
     public ChatHolder chatholder;
+    String selfJid;
     public ChatListAdapter(Context context) {
-        this.chatList = ChatModel.get(context).getChats();
+        selfJid = PreferenceManager.getDefaultSharedPreferences(context).getString("xmpp_jid",null);
+        List<Chat> list = ChatModel.get(context).getChats(selfJid);
+        Map<String,Chat> chatListMap=new HashMap<String,Chat>();
+        for (Chat element : list) {
+            if(element.getToContactJid().equals(selfJid)) {
+                if(chatListMap.containsKey(element.getFromContactJid())) {
+                    Chat data=chatListMap.get(element.getFromContactJid());
+                    if(element.getLastMessageTimeStamp()>data.getLastMessageTimeStamp()) {
+                        chatListMap.put(element.getFromContactJid(),element);
+                    }
+                } else{
+                    chatListMap.put(element.getFromContactJid(),element);
+                }
+            } else {
+                if(chatListMap.containsKey(element.getToContactJid())) {
+                    Chat data=chatListMap.get(element.getToContactJid());
+                    if(element.getLastMessageTimeStamp()>data.getLastMessageTimeStamp()) {
+                        chatListMap.put(element.getToContactJid(),element);
+                    }
+                } else{
+                    chatListMap.put(element.getToContactJid(),element);
+                }
+            }
+        }
+        this.chatList=new ArrayList<>();
+        for(Map.Entry<String, Chat> entry: chatListMap.entrySet()) {
+            chatList.add(entry.getValue());
+        }
         this.mContext = context;
     }
+
+
+
     public OnItemClickListener getmOnItemClickListener() {
         return mOnItemClickListener;
     }
@@ -58,6 +97,7 @@ public class ChatListAdapter extends RecyclerView.Adapter<ChatHolder> {
         chatholder = new ChatHolder(view,this, mContext);
         return chatholder;
     }
+    @RequiresApi(api = Build.VERSION_CODES.N)
     @Override
     public void onBindViewHolder(ChatHolder holder, int position) {
         Chat chat = chatList.get(position);
@@ -68,17 +108,18 @@ public class ChatListAdapter extends RecyclerView.Adapter<ChatHolder> {
         return chatList.size();
     }
     public void onChatCountChange() {
-        chatList = ChatModel.get(mContext).getChats();
+        chatList = ChatModel.get(mContext).getChats(selfJid);
         notifyDataSetChanged();
     }
+    @RequiresApi(api = Build.VERSION_CODES.N)
     public void OnNewMessage(String user) {
-        chatList = ChatModel.get(mContext).getChats();
+        chatList = ChatModel.get(mContext).getChats(selfJid);
         notifyDataSetChanged();
         Log.d(LOGTAG, "OnNewMessage"+ " "+ user);
         for (Chat chat:
              chatList) {
-             if (chat.getJid().equals(user)) {
-                 Log.d(LOGTAG, chat.getJid()+ " "+ user);
+             if (chat.getToContactJid().equals(user)) {
+                 Log.d(LOGTAG, chat.getToContactJid()+ " "+ user);
                 chatholder.bindChat(chat);
             }
         }
@@ -117,17 +158,23 @@ class ChatHolder extends RecyclerView.ViewHolder{
                 ChatListAdapter.OnItemLongClickListener listener = mChatListAdapter.getOnItemLongClickListener();
                 if(listener != null)
                 {
-                    listener.onItemLongClick(mChat.getJid(),mChat.getPersistID(),itemView);
+                    listener.onItemLongClick(mChat.getToContactJid(),mChat.getPersistID(),itemView);
                     return true;
                 }
                 return false;
             }
         });
     }
+    @RequiresApi(api = Build.VERSION_CODES.N)
     public void bindChat(Chat chat)
     {
         mChat = chat;
-        contactTextView.setText(chat.getJid());
+        String selfJid = PreferenceManager.getDefaultSharedPreferences(mContext).getString("xmpp_jid",null);
+        if(selfJid.equals(chat.getFromContactJid())) {
+            contactTextView.setText(chat.getToContactJid());
+        } else {
+            contactTextView.setText(chat.getFromContactJid());
+        }
         Typeface typeface = ResourcesCompat.getFont(this.mContext, R.font.nanosanslight);
         messageAbstractTextView.setTypeface(typeface);
         String message = chat.getLastMessage();
@@ -138,7 +185,7 @@ class ChatHolder extends RecyclerView.ViewHolder{
         RoosterConnection rc = RoosterConnectionService.getConnection();
         if(rc != null)
         {
-            String imageAbsPath = rc.getProfileImageAbsolutePath(mChat.getJid());
+            String imageAbsPath = rc.getProfileImageAbsolutePath(mChat.getToContactJid());
             if ( imageAbsPath != null)
             {
                 Drawable d = Drawable.createFromPath(imageAbsPath);

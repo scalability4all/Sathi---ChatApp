@@ -29,10 +29,10 @@ public class ChatMessagesModel {
         this.context = context;
         mDatabase = DatabaseBackend.getInstance(context).getWritableDatabase();
     }
-    public List<ChatMessage> getMessages(String counterpartJid)
+    public List<ChatMessage> getMessages(String counterpartJid,String fromJid)
     {
         List<ChatMessage> messages = new ArrayList<>();
-        ChatMessageCursorWrapper cursor = queryMessages("contactJid= ?",new String[] {counterpartJid});
+        ChatMessageCursorWrapper cursor = queryMessages("(toContactJid= ? and fromContactJid= ?) or (fromContactJid= ? and toContactJid= ?)",new String[] {counterpartJid,fromJid,fromJid,counterpartJid});
         try
         {
             cursor.moveToFirst();
