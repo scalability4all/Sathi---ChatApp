@@ -6,6 +6,7 @@ import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
 import android.text.Html;
 import android.text.TextUtils;
+import android.text.method.LinkMovementMethod;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -135,7 +136,9 @@ class ChatHolder extends RecyclerView.ViewHolder{
         String message = chat.getLastMessage();
         TextUtils.htmlEncode(message);
         messageAbstractTextView.setText(Html.fromHtml(message, Html.FROM_HTML_MODE_COMPACT));
+        timestampTextView.setMovementMethod(LinkMovementMethod.getInstance());
         timestampTextView.setText(Utilities.getFormattedTime(mChat.getLastMessageTimeStamp()));
+
         profileImage.setImageResource(R.drawable.ic_profile);
         RoosterConnection rc = RoosterConnectionService.getConnection();
         if(rc != null)

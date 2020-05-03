@@ -5,6 +5,7 @@ import android.graphics.drawable.Drawable;
 import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.text.method.LinkMovementMethod;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -113,6 +114,7 @@ class ChatMessageViewHolder extends RecyclerView.ViewHolder{
     public ChatMessageViewHolder(final View itemView, final ChatMessagesAdapter mAdapter) {
         super(itemView);
         mMessageBody = itemView.findViewById(R.id.text_message_body);
+        mMessageBody.setMovementMethod(LinkMovementMethod.getInstance());
         mMessageTimestamp = itemView.findViewById(R.id.text_message_timestamp);
         profileImage = itemView.findViewById(R.id.profile);
         this.mAdapter = mAdapter;

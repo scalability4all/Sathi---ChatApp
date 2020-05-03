@@ -36,7 +36,7 @@ public class Settings extends AppCompatActivity {
     private String languageSelected;
     private String[] newsCategoriesSelected;
     private CharSequence[] languages;
-    private CharSequence[] newsCategories = {"Business","Politics","Entertainment", "Fashion", "Education"};
+    private CharSequence[] newsCategories = {"Business","Politics","Entertainment", "LifeStyle", "India", "Sports", "World"};
     private EditText language;
     private EditText newsCategory;
     private String selectedLanguage;
