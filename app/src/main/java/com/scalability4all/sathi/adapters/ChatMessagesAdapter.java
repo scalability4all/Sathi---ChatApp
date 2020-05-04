@@ -24,6 +24,8 @@ import com.scalability4all.sathi.xmpp.RoosterConnection;
 import com.scalability4all.sathi.xmpp.RoosterConnectionService;
 import java.util.List;
 
+import me.saket.bettermovementmethod.BetterLinkMovementMethod;
+
 public class ChatMessagesAdapter extends RecyclerView.Adapter<ChatMessageViewHolder> {
     public interface OnInformRecyclerViewToScrollDownListener {
         public void onInformRecyclerViewToScrollDown(int size);
@@ -127,25 +129,13 @@ class ChatMessageViewHolder extends RecyclerView.ViewHolder{
     private ChatMessagesAdapter mAdapter;
     public ChatMessageViewHolder(final View itemView, final ChatMessagesAdapter mAdapter) {
         super(itemView);
-        Intent viewIntent = new Intent(Intent.ACTION_VIEW);
-        viewIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        //mAdapter.getContext().startActivity();
+
         mMessageBody = itemView.findViewById(R.id.text_message_body);
-        mMessageBody.setMovementMethod(LinkMovementMethod.getInstance());
-        Linkify.addLinks(mMessageBody , Linkify.WEB_URLS);
+
         mMessageTimestamp = itemView.findViewById(R.id.text_message_timestamp);
         profileImage = itemView.findViewById(R.id.profile);
         this.mAdapter = mAdapter;
-        mMessageBody .setOnClickListener(new View.OnClickListener() {
-            //Override
-            public void onClick(View v) {
-                String url = "http://"  + mMessageBody.getText().toString();
-                Intent i = new Intent(Intent.ACTION_VIEW);
-                i.setData(Uri.parse(url));
-                mAdapter.getContext().startActivity(i);
-            }
-        });
-        //itemView.getContext().startActivity(viewIntent);
+
         itemView.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View v) {
@@ -162,6 +152,21 @@ class ChatMessageViewHolder extends RecyclerView.ViewHolder{
     {
         mChatMessage = chatMessage;
         mMessageBody.setText(chatMessage.getMessage());
+        // https://github.com/saket/Better-Link-Movement-Method
+        // http://saket.me/better-url-handler-textview-android/
+        BetterLinkMovementMethod
+                .linkify(Linkify.ALL, mMessageBody)
+                .setOnLinkClickListener((textView, url) -> {
+                    Intent i = new Intent(Intent.ACTION_VIEW);
+                    i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                    i.setData(Uri.parse(url));
+                    mAdapter.getContext().startActivity(i);
+                    return true;
+                })
+                .setOnLinkLongClickListener((textView, url) -> {
+                    // Handle long-clicks.
+                    return true;
+                });
         mMessageTimestamp.setText(Utilities.getFormattedTime(chatMessage.getTimestamp()));
         profileImage.setImageResource(R.mipmap.ic_profile);
         ChatMessage.Type type = mChatMessage.getType();
