@@ -45,3 +45,19 @@ jobs:
       #- run: 
       #   command: ./gradlew build --stacktrace
           #working_directory: .
+          
+  gradle-6.3.0:
+    docker:
+    - image: circleci/openjdk:8-jdk
+    working_directory: ~/repo
+    environment:
+      JVM_OPTS: -Xmx3200m
+      TERM: dumb
+    steps:
+    - attach_workspace:
+        at: .
+    - restore_cache:
+        keys:
+        - v1-dependencies-{{ checksum "build.gradle" }}
+    - run:
+        command: ./gradlew check --project-prop gradleVersion=6.3.0
