@@ -1,8 +1,11 @@
 package com.scalability4all.sathi.adapters;
 
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.drawable.Drawable;
+import android.net.Uri;
 import android.preference.PreferenceManager;
+import android.text.util.Linkify;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.text.method.LinkMovementMethod;
@@ -20,6 +23,8 @@ import com.scalability4all.sathi.model.ChatMessagesModel;
 import com.scalability4all.sathi.xmpp.RoosterConnection;
 import com.scalability4all.sathi.xmpp.RoosterConnectionService;
 import java.util.List;
+
+import me.saket.bettermovementmethod.BetterLinkMovementMethod;
 
 public class ChatMessagesAdapter extends RecyclerView.Adapter<ChatMessageViewHolder> {
     public interface OnInformRecyclerViewToScrollDownListener {
@@ -124,11 +129,13 @@ class ChatMessageViewHolder extends RecyclerView.ViewHolder{
     private ChatMessagesAdapter mAdapter;
     public ChatMessageViewHolder(final View itemView, final ChatMessagesAdapter mAdapter) {
         super(itemView);
+
         mMessageBody = itemView.findViewById(R.id.text_message_body);
-        mMessageBody.setMovementMethod(LinkMovementMethod.getInstance());
+
         mMessageTimestamp = itemView.findViewById(R.id.text_message_timestamp);
         profileImage = itemView.findViewById(R.id.profile);
         this.mAdapter = mAdapter;
+
         itemView.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View v) {
@@ -145,6 +152,21 @@ class ChatMessageViewHolder extends RecyclerView.ViewHolder{
     {
         mChatMessage = chatMessage;
         mMessageBody.setText(chatMessage.getMessage());
+        // https://github.com/saket/Better-Link-Movement-Method
+        // http://saket.me/better-url-handler-textview-android/
+        BetterLinkMovementMethod
+                .linkify(Linkify.ALL, mMessageBody)
+                .setOnLinkClickListener((textView, url) -> {
+                    Intent i = new Intent(Intent.ACTION_VIEW);
+                    i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                    i.setData(Uri.parse(url));
+                    mAdapter.getContext().startActivity(i);
+                    return true;
+                })
+                .setOnLinkLongClickListener((textView, url) -> {
+                    // Handle long-clicks.
+                    return true;
+                });
         mMessageTimestamp.setText(Utilities.getFormattedTime(chatMessage.getTimestamp()));
         profileImage.setImageResource(R.mipmap.ic_profile);
         ChatMessage.Type type = mChatMessage.getType();
