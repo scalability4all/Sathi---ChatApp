@@ -45,12 +45,15 @@ jobs:
           command: ./gradlew lint
 
       - run:
+          name: clean project
           command: ./gradlew clean
 
       - run:
+          name: Assembles main output for variant debug
           command: ./gradlew assembleDebug --stacktrace
 
       - run:
+          name: Assembles and tests this project
           command: ./gradlew build
 
       - store_artifacts:
