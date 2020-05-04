@@ -3,6 +3,7 @@ package com.scalability4all.sathi.adapters;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.drawable.Drawable;
+import android.net.Uri;
 import android.preference.PreferenceManager;
 import android.text.util.Linkify;
 import android.util.Log;
@@ -135,6 +136,15 @@ class ChatMessageViewHolder extends RecyclerView.ViewHolder{
         mMessageTimestamp = itemView.findViewById(R.id.text_message_timestamp);
         profileImage = itemView.findViewById(R.id.profile);
         this.mAdapter = mAdapter;
+        mMessageBody .setOnClickListener(new View.OnClickListener() {
+            //Override
+            public void onClick(View v) {
+                String url = "http://"  + mMessageBody.getText().toString();
+                Intent i = new Intent(Intent.ACTION_VIEW);
+                i.setData(Uri.parse(url));
+                mAdapter.getContext().startActivity(i);
+            }
+        });
         //itemView.getContext().startActivity(viewIntent);
         itemView.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
