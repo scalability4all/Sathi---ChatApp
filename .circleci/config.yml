@@ -30,7 +30,9 @@ jobs:
             - v1-dependencies-{{ checksum "build.gradle" }}
             # fallback to using the latest cache if no exact match is found
             - v1-dependencies-
-
+      - run:
+          name: Add SDK 28
+          command: echo yes | ${ANDROID_HOME}/tools/bin/sdkmanager "platforms;android-28"
       - run: ./gradlew dependencies
 
       - save_cache:
