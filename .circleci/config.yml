@@ -40,5 +40,5 @@ jobs:
 
       # build
       - run: 
-          command: ./gradlew build
+          command: ./gradlew build --stacktrace
           #working_directory: .
