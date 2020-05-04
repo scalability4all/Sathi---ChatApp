@@ -1,6 +1,6 @@
 # Sathi---ChatApp
 
-Master Build Status [![CircleCI](https://circleci.com/gh/scalability4all/Sathi---ChatApp/tree/master.svg?style=svg)](https://circleci.com/gh/scalability4all/Sathi---ChatApp/tree/master)
+Master Build Status [![CircleCI](https://circleci.com/gh/scalability4all/Sathi---ChatApp/tree/master.svg?style=svg&circle-token=a2139fdbb87b165dc83d6c416bb3cf81901c6fb4)](https://circleci.com/gh/scalability4all/Sathi---ChatApp/tree/master?circle-token=a2139fdbb87b165dc83d6c416bb3cf81901c6fb4)
 
 An android application which enables users to connect to each other through text messages and provides additional features like viewing the 'last seen' and reading status of others.
 
