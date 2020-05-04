@@ -29,6 +29,14 @@ android {
         sourceCompatibility = 1.8
         targetCompatibility = 1.8
     }
+    configurations {
+        all {
+            exclude module: 'httpclient'
+            exclude module: 'json'
+            exclude module: 'xpp3'
+            exclude group: 'org.apache.httpcomponents'
+        }
+    }
 }
 
 ext {

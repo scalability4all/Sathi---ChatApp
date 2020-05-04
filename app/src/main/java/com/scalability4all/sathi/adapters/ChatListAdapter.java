@@ -8,6 +8,8 @@ import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.preference.PreferenceManager;
 import android.text.Html;
+import android.text.SpannableString;
+import android.text.Spanned;
 import android.text.TextUtils;
 import android.text.method.LinkMovementMethod;
 import android.util.Log;
@@ -165,6 +167,19 @@ class ChatHolder extends RecyclerView.ViewHolder{
             }
         });
     }
+    @SuppressWarnings("deprecation")
+    public static Spanned fromHtml(String html){
+        if(html == null){
+            // return an empty spannable if the html is null
+            return new SpannableString("");
+        }else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            // FROM_HTML_MODE_LEGACY is the behaviour that was used for versions below android N
+            // we are using this flag to give a consistent behaviour
+            return Html.fromHtml(html, Html.FROM_HTML_MODE_LEGACY);
+        } else {
+            return Html.fromHtml(html);
+        }
+    }
     public void bindChat(Chat chat)
     {
         mChat = chat;
@@ -178,7 +193,7 @@ class ChatHolder extends RecyclerView.ViewHolder{
         messageAbstractTextView.setTypeface(typeface);
         String message = chat.getLastMessage();
         TextUtils.htmlEncode(message);
-        messageAbstractTextView.setText(Html.fromHtml(message, Html.FROM_HTML_MODE_COMPACT));
+        messageAbstractTextView.setText(fromHtml(message));
         timestampTextView.setMovementMethod(LinkMovementMethod.getInstance());
         timestampTextView.setText(Utilities.getFormattedTime(mChat.getLastMessageTimeStamp()));
 
