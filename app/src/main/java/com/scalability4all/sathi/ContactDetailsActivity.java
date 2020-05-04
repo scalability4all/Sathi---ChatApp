@@ -86,7 +86,7 @@ public class ContactDetailsActivity extends AppCompatActivity {
                 }
             }
         });
-        // Aboabfrage Kontakt und entsprechende Layoutänderungen
+        // Subscription query contact and corresponding layout changes
         if(!ContactModel.get(getApplication()).isContactStranger(contactJid))
         {
             Contact contact = ContactModel.get(getApplicationContext()).getContactByJidString(contactJid);
