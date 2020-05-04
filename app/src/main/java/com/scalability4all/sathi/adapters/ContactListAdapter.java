@@ -113,7 +113,7 @@ class ContactHolder extends RecyclerView.ViewHolder {
         }
         jidTexView.setText(mContact.getJid());
         subscriptionTypeTextView.setText(mContact.getTypeStringValue(mContact.getSubscriptionType()));
-        profile_image.setImageResource(R.drawable.ic_profile);
+        profile_image.setImageResource(R.mipmap.ic_profile);
         RoosterConnection rc = RoosterConnectionService.getConnection();
         if(rc != null)
         {

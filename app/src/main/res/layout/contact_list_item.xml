@@ -3,27 +3,23 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-
     android:layout_height="wrap_content"
-
-    android:layout_marginBottom="2dp"
-    android:background="#f0f0f0">
+    android:layout_marginBottom="4dp"
+    android:background="@drawable/background_border"
+    android:elevation="2dp"
+    android:padding="10dp">
 
     <com.makeramen.roundedimageview.RoundedImageView
         android:id="@+id/profile_contact"
         android:layout_width="72dp"
-        android:layout_height="90dp"
-        android:layout_marginRight="10dp"
-        android:layout_marginStart="5dp"
-        android:src="@drawable/ic_profile"
-        app:riv_border_color="@color/riv_border_color"
-        app:riv_border_width="1dip"
+        android:layout_height="60dp"
+        android:src="@mipmap/ic_profile"
         app:riv_corner_radius="52dp" />
 
     <FrameLayout xmlns:app="http://schemas.android.com/apk/res-auto"
         android:id="@+id/message_body"
         android:layout_width="match_parent"
-        android:layout_height="90dp"
+        android:layout_height="wrap_content"
         android:layout_marginStart="5dp"
         android:layout_toRightOf="@id/profile_contact">
 
@@ -31,6 +27,9 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:layout_marginLeft="4dp"
+            android:layout_marginTop="4dp"
             android:gravity="end"
             android:orientation="vertical">
 
@@ -39,8 +38,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
-                android:text="user@example.com"
-                android:textColor="@color/default_bubble_color_rcv"
+                android:text="@string/user_example_com"
+                android:textColor="@color/textColor"
                 android:textSize="@dimen/default_message_chat_text_size"
                 tools:text="user@server.com" />
 

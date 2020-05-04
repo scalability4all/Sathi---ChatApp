@@ -35,7 +35,7 @@ public class ContactDetailsActivity extends AppCompatActivity {
         setTitle(contactJid);
         ImageView profileImage = findViewById(R.id.contact_details_user_profile);
         RoosterConnection rc = RoosterConnectionService.getConnection();
-        profileImage.setImageResource(R.drawable.ic_profile);
+        profileImage.setImageResource(R.mipmap.ic_profile);
         if(rc != null)
         {
             String imageAbsPath = rc.getProfileImageAbsolutePath(contactJid);

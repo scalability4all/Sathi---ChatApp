@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
-    android:background="@color/cardview_light_background">
+    android:background="@color/white">
 
     <RelativeLayout
         android:layout_width="match_parent"
@@ -17,7 +17,7 @@
             android:layout_alignParentTop="true"
             android:layout_centerHorizontal="true"
             android:layout_marginRight="16dp"
-            android:src="@drawable/ic_profile"
+            android:src="@mipmap/ic_profile"
             app:riv_border_color="@color/riv_border_color"
             app:riv_border_width="1dip"
             app:riv_corner_radius="12dp" />

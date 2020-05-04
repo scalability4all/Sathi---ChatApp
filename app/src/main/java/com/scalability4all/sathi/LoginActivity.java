@@ -17,11 +17,12 @@ import android.view.View.OnClickListener;
 import android.view.inputmethod.EditorInfo;
 import android.widget.AutoCompleteTextView;
 import android.widget.EditText;
-import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.google.android.material.button.MaterialButton;
+import com.google.android.material.textfield.TextInputEditText;
 import com.scalability4all.sathi.services.VolleyCallback;
 import com.scalability4all.sathi.services.VolleyService;
 import com.scalability4all.sathi.xmpp.RoosterConnectionService;
@@ -49,8 +50,8 @@ import static com.scalability4all.sathi.services.VolleyService.GET_USER_DETAILS;
 
 public class LoginActivity extends AppCompatActivity {
     private static final String LOGTAG = "RoosterPlus";
-    private AutoCompleteTextView mJidView;
-    private EditText mPasswordView;
+    private TextInputEditText mJidView;
+    private TextInputEditText mPasswordView;
     private View mProgressView;
     private View mLoginFormView;
     private BroadcastReceiver mBroadcastReceiver;
@@ -72,7 +73,7 @@ public class LoginActivity extends AppCompatActivity {
                 return false;
             }
         });
-        ImageView mJidSignInButton = findViewById(R.id.jid_sign_in_button);
+        MaterialButton mJidSignInButton = findViewById(R.id.jid_sign_in_button);
         mJidSignInButton.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -89,39 +90,7 @@ public class LoginActivity extends AppCompatActivity {
                 startActivity(i);
             }
         });
-//        ImageView mJidRegisterButton = findViewById(R.id.jid_register_button);
-//        // Registrierungsdialog
-//        mJidRegisterButton.setOnClickListener(new OnClickListener() {
-//            @Override
-//            public void onClick(View view) {
-//                final Dialog dialog = new Dialog(LoginActivity.this);
-//                dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
-//                dialog.setCancelable(false);
-//                dialog.setContentView(R.layout.register_dialog);
-//                ImageView rJidReg = dialog.findViewById(R.id.login_register_reg);
-//                ImageView rJidCancel = dialog.findViewById(R.id.login_register_cancel);
-//                rJidReg.setOnClickListener(new OnClickListener() {
-//                    @Override
-//                    public void onClick(View view) {
-//                        EditText username = dialog.findViewById(R.id.dialog_register_jid);
-//                        EditText password = dialog.findViewById(R.id.dialog_register_password);
-//                        try {
-//                            attemptRegister(username.getText().toString(), password.getText().toString());
-//                            dialog.dismiss();
-//                        } catch (IOException e) {
-//                            e.printStackTrace();
-//                        }
-//                    }
-//                });
-//                rJidCancel.setOnClickListener(new OnClickListener() {
-//                    @Override
-//                    public void onClick(View view) {
-//                        dialog.dismiss();
-//                    }
-//                });
-//                dialog.show();
-//            }
-//        });
+
     }
     @Override
     protected void onPause() {
@@ -160,20 +129,20 @@ public class LoginActivity extends AppCompatActivity {
         this.registerReceiver(mBroadcastReceiver, filter);
     }
     private void attemptLogin() {
-        // Errors zurücksetzen
+        // Errors reset to default
         mJidView.setError(null);
         mPasswordView.setError(null);
         String jid = mJidView.getText().toString();
         String password = mPasswordView.getText().toString();
         boolean cancel = false;
         View focusView = null;
-        // Passwortüberprüfung (hier nur noch Länge, nicht ob auf Server richtig
+        //Password check (length only here, not correct on server
         if (!TextUtils.isEmpty(password) && !isPasswordValid(password)) {
             mPasswordView.setError(getString(R.string.error_invalid_password));
             focusView = mPasswordView;
             cancel = true;
         }
-        // JID überprüfen (per @)
+        // JID check (per @)
         if (TextUtils.isEmpty(jid)) {
             mJidView.setError(getString(R.string.error_field_required));
             focusView = mJidView;
@@ -196,7 +165,7 @@ public class LoginActivity extends AppCompatActivity {
     private boolean isPasswordValid(String password) {
         return password.length() > 4;
     }
-    // Progressbar zeigen und Login ausblenden
+    // Show progress bar and hide login
     @TargetApi(Build.VERSION_CODES.HONEYCOMB_MR2)
     private void showProgress(final boolean show) {
         mProgressView.setVisibility(show ? View.VISIBLE : View.GONE);

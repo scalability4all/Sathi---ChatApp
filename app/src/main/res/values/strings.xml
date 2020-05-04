@@ -55,6 +55,8 @@
     <string name="category_choose_stmt">Select News Categories</string>
     <string name="save">Save</string>
     <string name="cancel">Cancel</string>
+    <string name="hint_user_name">User Name</string>
+    <string name="login">Login</string>
 <!--    <string-array name="languages">-->
 <!--        <item>English</item>-->
 <!--        <item>Hindi</item>-->
