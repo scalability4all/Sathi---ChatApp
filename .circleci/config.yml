@@ -40,7 +40,7 @@ jobs:
       - run:
           command: ./gradlew clean
       - run:
-          command: ./gradlew assembleDebug --stacktrace
+          command: ./gradlew assembleDebug --stacktrace --scan
       # build
       #- run: 
       #   command: ./gradlew build --stacktrace
