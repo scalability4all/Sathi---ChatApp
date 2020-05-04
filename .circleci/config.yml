@@ -38,6 +38,8 @@ jobs:
             - ~/.gradle
           key: v1-dependencies-{{ checksum "build.gradle" }}
       - run:
+          command: ./gradlew clean
+      - run:
           command: ./gradlew assembleDebug --stacktrace
       # build
       #- run: 
