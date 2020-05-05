@@ -11,14 +11,12 @@
         android:id="@+id/profile"
         android:layout_width="62dp"
         android:layout_height="62dp"
-        app:riv_corner_radius="52dp"
+        android:src="@mipmap/ic_profile"
         app:riv_border_color="@color/riv_border_color"
         app:riv_border_width="1dip"
-        android:src="@mipmap/ic_profile"
-        android:layout_centerVertical="true"/>
+        app:riv_corner_radius="52dp" />
 
     <FrameLayout
-        xmlns:app="http://schemas.android.com/apk/res-auto"
         android:id="@+id/message_body"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -36,22 +34,22 @@
             android:layout_height="wrap_content">
 
             <LinearLayout
-                android:padding="8dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
                 android:gravity="end"
                 android:orientation="vertical"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content">
+                android:padding="8dp">
 
                 <TextView
                     android:id="@+id/text_message_body"
-                    tools:text="Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. "
-                    android:textSize="@dimen/default_message_text_size"
-                    android:linksClickable="true"
-                    android:textColor="@color/default_message_color_send"
-                    android:gravity="center_vertical|start"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_gravity="left"/>
+                    android:layout_gravity="left"
+                    android:gravity="center_vertical|start"
+                    android:linksClickable="true"
+                    android:textColor="@color/default_message_color_send"
+                    android:textSize="@dimen/default_message_text_size"
+                    tools:text="Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. " />
 
                 <androidx.legacy.widget.Space
                     android:layout_width="match_parent"
@@ -59,12 +57,12 @@
 
                 <TextView
                     android:id="@+id/text_message_timestamp"
-                    tools:text="12:10 am"
-                    android:textSize="@dimen/default_timestamp_text_size"
-                    android:textColor="@color/default_tstamp_color_send"
-                    android:gravity="center_vertical|start"
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content" />
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical|start"
+                    android:textColor="@color/default_tstamp_color_send"
+                    android:textSize="@dimen/default_timestamp_text_size"
+                    tools:text="12:10 am" />
 
             </LinearLayout>
 
