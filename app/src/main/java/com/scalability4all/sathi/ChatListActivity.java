@@ -73,7 +73,7 @@ public class ChatListActivity extends AppCompatActivity implements ChatListAdapt
         setContentView(R.layout.activity_chat_list);
         setTitle(R.string.chatListTitle);
         getContactPermission();
-        //Loginstatus abrufen, Falls nicht eingeloggt zurück zum LoginScreen
+        //Retrieve login status, if not logged back to login screen
         boolean logged_in_state = PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).getBoolean("xmpp_logged_in", false);
         if (!logged_in_state) {
             Log.d(LOGTAG, "Login Status :" + logged_in_state);
@@ -282,8 +282,9 @@ public class ChatListActivity extends AppCompatActivity implements ChatListAdapt
         popup.show();
     }
 
-    // Ein Versuch zum Erstellen eines GroupChat auf dem Openfire Server
-    // Leider ohne Funktion. Nähere Details im Projektbericht
+    // An attempt to create a GroupChat on the Openfire server
+    // Unfortunately without function
+    // todo
     public void createGroupChat(XMPPConnection connection) {
         MultiUserChatManager manager = MultiUserChatManager.getInstanceFor(connection);
         try {

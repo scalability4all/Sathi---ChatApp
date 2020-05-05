@@ -86,10 +86,10 @@ public class MeActivity extends AppCompatActivity implements View.OnClickListene
         this.registerReceiver(mBroadcastReceiver, filter);
     }
 
-    //OnClick für Profilbild
+    //OnClick for profile pictures
     @Override
     public void onClick(View v) {
-        Log.d(LOGTAG,"Profilbild geklickt");
+        Log.d(LOGTAG,"Profile picture clicked");
         Intent photoPickerIntent = new Intent(Intent.ACTION_PICK);
         photoPickerIntent.setType("image/*");
         startActivityForResult(photoPickerIntent, SELECT_PHOTO);
@@ -115,24 +115,24 @@ public class MeActivity extends AppCompatActivity implements View.OnClickListene
                         ByteArrayOutputStream stream = new ByteArrayOutputStream();
                         bm.compress(Bitmap.CompressFormat.PNG, 0, stream);
                         byte[] byteArray = stream.toByteArray();
-                        Log.d(LOGTAG,"Bitmap != NULL; Bild wird gesetzt; Arraysize:" +byteArray.length);
+                        Log.d(LOGTAG,"Bitmap != NULL; Picture is set; Arraysize:" +byteArray.length);
                         RoosterConnection rc = RoosterConnectionService.getConnection();
                         if ( rc != null) {
                             if (rc.setSelfAvatar(byteArray)) {
-                                Log.d(LOGTAG, "Profilbild gesetzt");
+                                Log.d(LOGTAG, "Profile picture set");
                                 //Set the avatar to be shown in the profile Image View
                                 Drawable image = new BitmapDrawable(getResources(),
                                         BitmapFactory.decodeByteArray(byteArray, 0, byteArray.length));
                                 profileImageView.setImageDrawable(image);
                             } else
                             {
-                                Log.d(LOGTAG,"Profilbild konnte nicht gesetzt werden");
+                                Log.d(LOGTAG,"Profile picture could not be set");
                             }
                         }
                     }
                 }else
                 {
-                    Log.d(LOGTAG,"Bildauswahl abgebrochen");
+                    Log.d(LOGTAG,"Image selection canceled");
                 }
         }
     }
@@ -141,9 +141,9 @@ public class MeActivity extends AppCompatActivity implements View.OnClickListene
         BitmapFactory.Options o = new BitmapFactory.Options();
         o.inJustDecodeBounds = true;
         BitmapFactory.decodeStream(getContentResolver().openInputStream(selectedImage), null, o);
-        // Benötigte Größe
+        // Required size
         final int REQUIRED_SIZE = 140;
-        // Scale finden
+        // Find Scale
         int width_tmp = o.outWidth, height_tmp = o.outHeight;
         int scale = 1;
         while (true) {

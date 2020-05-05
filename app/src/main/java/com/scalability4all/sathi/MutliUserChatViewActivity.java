@@ -27,7 +27,7 @@ import org.jxmpp.jid.parts.Resourcepart;
 import org.jxmpp.stringprep.XmppStringprepException;
 
 
-// Gruppenchat ohne Funktion, nähere Details im Projektbericht
+// Group chat without function
 public class MutliUserChatViewActivity extends AppCompatActivity {
     public MultiUserChat mMultiUserChat;
     private MultiUserChatManager mMultiUserChatManager;
@@ -73,7 +73,7 @@ public class MutliUserChatViewActivity extends AppCompatActivity {
         }
     }
 
-    // XMPPConnection ohne Logindaten
+    // XMPPConnection without login data
     public XMPPConnection getConnection() {
         try {
             String serverurl = "saar-force.de";

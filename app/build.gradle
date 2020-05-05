@@ -25,6 +25,18 @@ android {
             debuggable true
         }
         }
+    compileOptions {
+        sourceCompatibility = 1.8
+        targetCompatibility = 1.8
+    }
+    configurations {
+        all {
+            exclude module: 'httpclient'
+            exclude module: 'json'
+            exclude module: 'xpp3'
+            exclude group: 'org.apache.httpcomponents'
+        }
+    }
 }
 
 ext {
@@ -59,6 +71,6 @@ dependencies {
     implementation 'com.makeramen:roundedimageview:2.3.0'
     implementation "androidx.cardview:cardview:1.0.0"
     implementation 'androidx.recyclerview:recyclerview:1.0.0'
-
+    implementation 'me.saket:better-link-movement-method:2.2.0'
 
 }
