@@ -41,6 +41,8 @@ import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 
+import static com.scalability4all.sathi.Constants.removeHostNameFromJID;
+
 public class ChatViewActivity extends AppCompatActivity implements ChatMessagesAdapter.OnInformRecyclerViewToScrollDownListener,KeyboardUtil.KeyboardVisibilityListener,ChatMessagesAdapter.OnItemLongClickListener {
     private static final String LOGTAG = "ChatViewActivity" ;
     RecyclerView chatMessagesRecyclerView ;
@@ -65,7 +67,7 @@ public class ChatViewActivity extends AppCompatActivity implements ChatMessagesA
         Intent intent = getIntent();
         counterpartJid = intent.getStringExtra("contact_jid");
         Chat.ContactType chatType = (Chat.ContactType)intent.getSerializableExtra("chat_type");
-        setTitle(counterpartJid);
+        setTitle(removeHostNameFromJID(counterpartJid));
         chatMessagesRecyclerView = findViewById(R.id.chatMessagesRecyclerView);
         chatMessagesRecyclerView.setLayoutManager(new LinearLayoutManager(getBaseContext()));
         adapter = new ChatMessagesAdapter(getApplicationContext(),counterpartJid,username);

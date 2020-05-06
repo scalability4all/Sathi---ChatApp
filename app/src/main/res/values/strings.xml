@@ -20,7 +20,7 @@
     <string name="last_message">Last known message ...</string>
     <string name="send_message">Send Message</string>
     <string name="title_activity_contact_list">Select contact</string>
-    <string name="add_contact_label_text">Jabber Id</string>
+    <string name="add_contact_label_text">Username</string>
     <string name="add_contact_confirm_text">OK</string>
     <string name="add_contact_cancel_text">Abort</string>
     <string name="me">My Profile</string>

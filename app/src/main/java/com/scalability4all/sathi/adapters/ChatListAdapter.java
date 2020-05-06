@@ -34,6 +34,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static com.scalability4all.sathi.Constants.removeHostNameFromJID;
+
 public class ChatListAdapter extends RecyclerView.Adapter<ChatHolder> {
     private static final String LOGTAG ="ChatListAdapter";
     public interface OnItemClickListener {
@@ -150,7 +152,7 @@ class ChatHolder extends RecyclerView.ViewHolder{
                 ChatListAdapter.OnItemClickListener listener = mChatListAdapter.getmOnItemClickListener();
                 if ( listener!= null)
                 {
-                    listener.onItemClick(contactTextView.getText().toString(),mChat.getContactType());
+                    listener.onItemClick(addHostName(contactTextView.getText().toString()),mChat.getContactType());
                 }
             }
         });
@@ -185,9 +187,9 @@ class ChatHolder extends RecyclerView.ViewHolder{
         mChat = chat;
         String selfJid = PreferenceManager.getDefaultSharedPreferences(mContext).getString("xmpp_jid",null);
         if(selfJid.equals(chat.getFromContactJid())) {
-            contactTextView.setText(chat.getToContactJid());
+            contactTextView.setText(removeHostNameFromJID(chat.getToContactJid()));
         } else {
-            contactTextView.setText(chat.getFromContactJid());
+            contactTextView.setText(removeHostNameFromJID(chat.getFromContactJid()));
         }
         Typeface typeface = ResourcesCompat.getFont(this.mContext, R.font.nanosanslight);
         messageAbstractTextView.setTypeface(typeface);
@@ -208,5 +210,8 @@ class ChatHolder extends RecyclerView.ViewHolder{
                 profileImage.setImageDrawable(d);
             }
         }
+    }
+    public String addHostName(String jid) {
+        return jid+"@localhost";
     }
 }

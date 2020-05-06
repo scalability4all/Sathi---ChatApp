@@ -31,6 +31,8 @@ import com.scalability4all.sathi.xmpp.RoosterConnectionService;
 
 import java.util.List;
 
+import static com.scalability4all.sathi.Constants.addHostNameToUserName;
+
 public class ContactListActivity extends AppCompatActivity implements ContactListAdapter.OnItemClickListener ,ContactListAdapter.OnItemLongClickListener {
     ContactListAdapter mAdapter;
     private static final String LOGTAG = "ContactListActivity";
@@ -68,7 +70,7 @@ public class ContactListActivity extends AppCompatActivity implements ContactLis
         builder.setPositiveButton(R.string.add_contact_confirm_text, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                if(ContactModel.get(getApplicationContext()).addContact(new Contact(input.getText().toString(), Contact.SubscriptionType.NONE)))
+                if(ContactModel.get(getApplicationContext()).addContact(new Contact(addHostNameToUserName(input.getText().toString(),ContactListActivity.this), Contact.SubscriptionType.NONE)))
                 {
                     mAdapter.onContactCountChange();
                     Log.d(LOGTAG,"Kontakt hinzugefügt");
@@ -149,4 +151,7 @@ public class ContactListActivity extends AppCompatActivity implements ContactLis
         });
         popup.show();
     }
+
+
+
 }

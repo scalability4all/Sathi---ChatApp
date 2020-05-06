@@ -18,6 +18,8 @@ import com.scalability4all.sathi.model.ContactModel;
 import com.scalability4all.sathi.xmpp.RoosterConnection;
 import com.scalability4all.sathi.xmpp.RoosterConnectionService;
 
+import static com.scalability4all.sathi.Constants.removeHostNameFromJID;
+
 public class ContactDetailsActivity extends AppCompatActivity {
     private static final String LOGTAG = "ContactDetailsActivity" ;
     private String contactJid;
@@ -32,7 +34,7 @@ public class ContactDetailsActivity extends AppCompatActivity {
         mApplicationContext=getApplicationContext();
         Intent intent = getIntent();
         contactJid = intent.getStringExtra("contact_jid");
-        setTitle(contactJid);
+        setTitle(removeHostNameFromJID(contactJid));
         ImageView profileImage = findViewById(R.id.contact_details_user_profile);
         RoosterConnection rc = RoosterConnectionService.getConnection();
         profileImage.setImageResource(R.mipmap.ic_profile);

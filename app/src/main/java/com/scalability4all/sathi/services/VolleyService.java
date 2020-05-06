@@ -26,6 +26,7 @@ public class VolleyService {
     Context mContext;
 
     public static String BASE_SERVER_IP_ADDRESS="http://34.93.240.242:4567/";
+    public static String GET_HOST_NAME="http://34.93.240.242:4567/";
     public static String GET_USER_DETAILS=BASE_SERVER_IP_ADDRESS+"user/details";
     public static String UPDATE_USER_PREFERENCE_LANGUAGE=BASE_SERVER_IP_ADDRESS+"update/user";
     public static String UPDATE_USER_PREFERENCE_CATEGORY=BASE_SERVER_IP_ADDRESS+"update/category";

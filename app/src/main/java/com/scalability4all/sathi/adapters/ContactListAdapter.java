@@ -18,6 +18,9 @@ import com.scalability4all.sathi.xmpp.RoosterConnection;
 import com.scalability4all.sathi.xmpp.RoosterConnectionService;
 import java.util.List;
 
+import static com.scalability4all.sathi.Constants.addHostNameToUserName;
+import static com.scalability4all.sathi.Constants.removeHostNameFromJID;
+
 public class ContactListAdapter extends RecyclerView.Adapter<ContactHolder> {
     public interface OnItemClickListener {
         public void onItemClick(String contactJid);
@@ -51,7 +54,7 @@ public class ContactListAdapter extends RecyclerView.Adapter<ContactHolder> {
     public ContactHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         LayoutInflater layoutInflater = LayoutInflater.from(parent.getContext());
         View view = layoutInflater.inflate(R.layout.contact_list_item, parent, false);
-        return new ContactHolder(view,this);
+        return new ContactHolder(view,this,mContext);
     }
     @Override
     public void onBindViewHolder(ContactHolder holder, int position) {
@@ -74,7 +77,7 @@ class ContactHolder extends RecyclerView.ViewHolder {
     private ImageView profile_image;
     private ContactListAdapter mAdapter;
     private static final String LOGTAG = "ContactHolder";
-    public ContactHolder(final View itemView , ContactListAdapter adapter) {
+    public ContactHolder(final View itemView , ContactListAdapter adapter,Context mContext) {
         super(itemView);
         mAdapter = adapter;
         jidTexView = itemView.findViewById(R.id.contact_jid_string);
@@ -87,7 +90,7 @@ class ContactHolder extends RecyclerView.ViewHolder {
                 ContactListAdapter.OnItemClickListener listener = mAdapter.getmOnItemClickListener();
                 if ( listener != null)
                 {
-                    listener.onItemClick(jidTexView.getText().toString());
+                    listener.onItemClick(addHostNameToUserName(jidTexView.getText().toString(),mContext));
                 }
             }
         });
@@ -111,7 +114,7 @@ class ContactHolder extends RecyclerView.ViewHolder {
         {
             return;
         }
-        jidTexView.setText(mContact.getJid());
+        jidTexView.setText(removeHostNameFromJID(mContact.getJid()));
         subscriptionTypeTextView.setText(mContact.getTypeStringValue(mContact.getSubscriptionType()));
         profile_image.setImageResource(R.mipmap.ic_profile);
         RoosterConnection rc = RoosterConnectionService.getConnection();
@@ -125,4 +128,6 @@ class ContactHolder extends RecyclerView.ViewHolder {
             }
         }
     }
+
+
 }

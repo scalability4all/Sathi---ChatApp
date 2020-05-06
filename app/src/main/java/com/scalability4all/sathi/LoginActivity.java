@@ -45,6 +45,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import static com.scalability4all.sathi.Constants.addHostNameToUserName;
+import static com.scalability4all.sathi.services.VolleyService.GET_HOST_NAME;
 import static com.scalability4all.sathi.services.VolleyService.GET_USER_DETAILS;
 
 
@@ -110,6 +112,7 @@ public class LoginActivity extends AppCompatActivity {
                         Log.d(LOGTAG,"Mainscreen opens\n");
                         showProgress(false);
                         // getting user details
+                        getHostName();
                         getUserPreferenceData(mJidView.getText().toString());
                         Intent i = new Intent(getApplicationContext(),ChatListActivity.class);
                         startActivity(i);
@@ -147,11 +150,7 @@ public class LoginActivity extends AppCompatActivity {
             mJidView.setError(getString(R.string.error_field_required));
             focusView = mJidView;
             cancel = true;
-        } else if (!isJidValid(jid)) {
-            mJidView.setError(getString(R.string.error_invalid_jid));
-            focusView = mJidView;
-            cancel = true;
-        }
+        } 
         if (cancel) {
             focusView.requestFocus();
         } else {
@@ -176,7 +175,7 @@ public class LoginActivity extends AppCompatActivity {
         Log.d(LOGTAG,"saveCredentialsAndLogin() called.");
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
         prefs.edit()
-                .putString("xmpp_jid", mJidView.getText().toString())
+                .putString("xmpp_jid", mJidView.getText().toString()+"@localhost")
                 .putString("xmpp_password", mPasswordView.getText().toString())
                 .commit();
 
@@ -223,12 +222,41 @@ public class LoginActivity extends AppCompatActivity {
         },LoginActivity.this).getDataVolley(GET_USER_DETAILS+'/'+username.split("@")[0]);
     }
 
+    private void getHostName() {
+        new VolleyService(new VolleyCallback() {
+            @Override
+            public void notifySuccess(JSONObject response) throws JSONException {
+                try {
+                    JSONObject data=new JSONObject(response.getString("data"));
+                    SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(LoginActivity.this);
+
+                    prefs.edit()
+                            .putString("hostname", data.getString("hostname"))
+                            .commit();
+
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+            @Override
+            public void notifyError(JSONObject error) {
+                try {
+                    Log.d(LOGTAG,"Parse error in getting user details");
+                    Log.d(LOGTAG,error.getString("data"));
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+
+            }
+        },LoginActivity.this).getDataVolley(GET_HOST_NAME);
+    }
+
     private void saveCredentialsAndLoginR(String username, String password)
     {
         Log.d(LOGTAG,"saveCredentialsAndLogin() called.");
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
         prefs.edit()
-                .putString("xmpp_jid", username)
+                .putString("xmpp_jid", addHostNameToUserName(username,LoginActivity.this))
                 .putString("xmpp_password", password)
                 .commit();
         Intent i1 = new Intent(this, RoosterConnectionService.class);
@@ -271,6 +299,7 @@ public class LoginActivity extends AppCompatActivity {
         };
         thread.start();
     }
+
 
 
 

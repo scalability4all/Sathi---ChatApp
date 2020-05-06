@@ -1,5 +1,9 @@
 package com.scalability4all.sathi;
 
+import android.content.Context;
+import android.content.SharedPreferences;
+import android.preference.PreferenceManager;
+
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
@@ -40,4 +44,13 @@ public class Constants {
         return null;
     }
 
+
+    public static String removeHostNameFromJID(String jid) {
+           return jid.split("@")[0];
+    }
+
+    public static String addHostNameToUserName(String username, Context mContext) {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(mContext);
+        return username+"@"+prefs.getString("hostname","");
+    }
 }
