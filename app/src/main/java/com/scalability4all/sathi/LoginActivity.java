@@ -112,7 +112,6 @@ public class LoginActivity extends AppCompatActivity {
                         Log.d(LOGTAG,"Mainscreen opens\n");
                         showProgress(false);
                         // getting user details
-                        getHostName();
                         getUserPreferenceData(mJidView.getText().toString());
                         Intent i = new Intent(getApplicationContext(),ChatListActivity.class);
                         startActivity(i);
@@ -155,7 +154,7 @@ public class LoginActivity extends AppCompatActivity {
             focusView.requestFocus();
         } else {
             showProgress(true);
-            saveCredentialsAndLogin();
+            getHostNameAndLogin();
         }
     }
     private boolean isJidValid(String email) {
@@ -175,7 +174,7 @@ public class LoginActivity extends AppCompatActivity {
         Log.d(LOGTAG,"saveCredentialsAndLogin() called.");
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
         prefs.edit()
-                .putString("xmpp_jid", mJidView.getText().toString()+"@localhost")
+                .putString("xmpp_jid", addHostNameToUserName(mJidView.getText().toString(),LoginActivity.this))
                 .putString("xmpp_password", mPasswordView.getText().toString())
                 .commit();
 
@@ -222,7 +221,7 @@ public class LoginActivity extends AppCompatActivity {
         },LoginActivity.this).getDataVolley(GET_USER_DETAILS+'/'+username.split("@")[0]);
     }
 
-    private void getHostName() {
+    private void getHostNameAndLogin() {
         new VolleyService(new VolleyCallback() {
             @Override
             public void notifySuccess(JSONObject response) throws JSONException {
@@ -233,7 +232,7 @@ public class LoginActivity extends AppCompatActivity {
                     prefs.edit()
                             .putString("hostname", data.getString("hostname"))
                             .commit();
-
+                    saveCredentialsAndLogin();
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }

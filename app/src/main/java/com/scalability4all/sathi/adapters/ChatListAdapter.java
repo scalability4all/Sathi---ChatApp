@@ -34,6 +34,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static com.scalability4all.sathi.Constants.addHostNameToUserName;
 import static com.scalability4all.sathi.Constants.removeHostNameFromJID;
 
 public class ChatListAdapter extends RecyclerView.Adapter<ChatHolder> {
@@ -152,7 +153,7 @@ class ChatHolder extends RecyclerView.ViewHolder{
                 ChatListAdapter.OnItemClickListener listener = mChatListAdapter.getmOnItemClickListener();
                 if ( listener!= null)
                 {
-                    listener.onItemClick(addHostName(contactTextView.getText().toString()),mChat.getContactType());
+                    listener.onItemClick(addHostNameToUserName(contactTextView.getText().toString(),mContext),mChat.getContactType());
                 }
             }
         });
@@ -210,8 +211,5 @@ class ChatHolder extends RecyclerView.ViewHolder{
                 profileImage.setImageDrawable(d);
             }
         }
-    }
-    public String addHostName(String jid) {
-        return jid+"@localhost";
     }
 }

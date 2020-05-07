@@ -43,6 +43,8 @@ import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import static com.scalability4all.sathi.Constants.addHostNameToUserName;
+import static com.scalability4all.sathi.services.VolleyService.GET_HOST_NAME;
 import static com.scalability4all.sathi.services.VolleyService.REGISTER_USER;
 import static com.scalability4all.sathi.services.VolleyService.UPDATE_USER_PREFERENCE_LANGUAGE;
 
@@ -220,7 +222,7 @@ public class Register extends AppCompatActivity {
                     doNotRegister=true;
                 }
                 if(!doNotRegister) {
-                    register(name,pwd,mailId,lng);
+                    getHostNameAndRegister(name,pwd,mailId,lng);
                     showProgress(true);
                 }
             }
@@ -273,7 +275,7 @@ public class Register extends AppCompatActivity {
                 {
                     case Constants.BroadCastMessages.UI_AUTHENTICATED:
                         Log.d(LOGTAG,"Mainscreen opens\n");
-                         showProgress(false);
+                        showProgress(false);
                         Intent i = new Intent(getApplicationContext(),ChatListActivity.class);
                         startActivity(i);
                         finish();
@@ -303,7 +305,7 @@ public class Register extends AppCompatActivity {
             public void notifySuccess(JSONObject response) throws JSONException {
                 SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(Register.this);
                 prefs.edit()
-                        .putString("xmpp_jid", name+"@"+getString(R.string.domain))
+                        .putString("xmpp_jid",addHostNameToUserName(name,Register.this))
                         .putString("xmpp_password",password)
                         .putString("xmpp_email",emailId)
                         .putString("language", language)
@@ -352,4 +354,34 @@ public class Register extends AppCompatActivity {
             }
         }, Register.this).postDataVolley(REGISTER_USER,data);
     }
+
+    private void getHostNameAndRegister(final String name, final String password, final String emailId, final String language) {
+        new VolleyService(new VolleyCallback() {
+            @Override
+            public void notifySuccess(JSONObject response) throws JSONException {
+                try {
+                    JSONObject data=new JSONObject(response.getString("data"));
+                    SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(Register.this);
+
+                    prefs.edit()
+                            .putString("hostname", data.getString("hostname"))
+                            .commit();
+                    register(name,password,emailId,language);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+            @Override
+            public void notifyError(JSONObject error) {
+                try {
+                    Log.d(LOGTAG,"Parse error in getting user details");
+                    Log.d(LOGTAG,error.getString("data"));
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+
+            }
+        },Register.this).getDataVolley(GET_HOST_NAME);
+    }
+
 }
