@@ -112,7 +112,7 @@ public class ChatListActivity extends AppCompatActivity implements ChatListAdapt
 
             //Register or UnRegister your broadcast receiver here
             unregisterReceiver(mBroadcastReceiver);
-        } catch (IllegalArgumentException e) {
+        } catch(IllegalArgumentException e) {
 
             e.printStackTrace();
         }
@@ -133,7 +133,7 @@ public class ChatListActivity extends AppCompatActivity implements ChatListAdapt
                     case Constants.BroadCastMessages.UI_NEW_MESSAGE_FLAG:
                         String JabberId = intent.getStringExtra("JabberId");
                         mAdapter.OnNewMessage(JabberId);
-                        Log.d(LOGTAG, "hi i am there " + JabberId);
+                        Log.d(LOGTAG, "hi i am there "+JabberId);
                         return;
                 }
             }
@@ -152,8 +152,8 @@ public class ChatListActivity extends AppCompatActivity implements ChatListAdapt
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        //    if (item.getItemId() == R.id.me) {
-        //      Intent i = new Intent(ChatListActivity.this, MeActivity.class);
+    //    if (item.getItemId() == R.id.me) {
+      //      Intent i = new Intent(ChatListActivity.this, MeActivity.class);
         //    startActivity(i);
         if (item.getItemId() == R.id.logout) {
             SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
@@ -163,17 +163,17 @@ public class ChatListActivity extends AppCompatActivity implements ChatListAdapt
                 stopService(i1);
                 //Register or UnRegister your broadcast receiver here
                 unregisterReceiver(mBroadcastReceiver);
-            } catch (IllegalArgumentException e) {
+            } catch(IllegalArgumentException e) {
 
                 e.printStackTrace();
             }
             Intent l = new Intent(ChatListActivity.this, LoginActivity.class);
             startActivity(l);
             finish();
-        } else if (item.getItemId() == R.id.settings) {
+        }  else if(item.getItemId() == R.id.settings) {
             Intent l = new Intent(ChatListActivity.this, Settings.class);
             startActivity(l);
-        } else if (item.getItemId() != R.id.logout) { //R.id.groupchat
+        }   else if (item.getItemId() != R.id.logout) { //R.id.groupchat
             // Gruppenchat Dialog
             final Dialog dialog = new Dialog(ChatListActivity.this);
             dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
@@ -213,7 +213,7 @@ public class ChatListActivity extends AppCompatActivity implements ChatListAdapt
                                 @Override
                                 public void run() {
                                     try {
-                                        while (true) {
+                                        while(true) {
                                             try {
                                                 mConnection.connect();
                                                 createGroupChat(mConnection);
