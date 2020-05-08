@@ -22,23 +22,20 @@ import com.scalability4all.sathi.model.ChatMessage;
 import com.scalability4all.sathi.model.ChatMessagesModel;
 import com.scalability4all.sathi.xmpp.RoosterConnection;
 import com.scalability4all.sathi.xmpp.RoosterConnectionService;
-
 import java.util.List;
 
 import me.saket.bettermovementmethod.BetterLinkMovementMethod;
 
 public class ChatMessagesAdapter extends RecyclerView.Adapter<ChatMessageViewHolder> {
     public interface OnInformRecyclerViewToScrollDownListener {
-        void onInformRecyclerViewToScrollDown(int size);
+        public void onInformRecyclerViewToScrollDown(int size);
     }
-
-    public interface OnItemLongClickListener {
-        void onItemLongClick(int uniqueId, View anchor);
+    public interface OnItemLongClickListener{
+        public void onItemLongClick(int uniqueId, View anchor);
     }
-
     private static final int SENT = 1;
     private static final int RECEIVED = 2;
-    private static final String LOGTAG = "ChatMessageAdapter";
+    private static final String LOGTAG ="ChatMessageAdapter" ;
     private List<ChatMessage> mChatMessageList;
     private LayoutInflater mLayoutInflater;
     private Context mContext;
@@ -55,91 +52,81 @@ public class ChatMessagesAdapter extends RecyclerView.Adapter<ChatMessageViewHol
     private String fromContactJid;
     private OnInformRecyclerViewToScrollDownListener mOnInformRecyclerViewToScrollDownListener;
     private OnItemLongClickListener onItemLongClickListener;
-
     public void setmOnInformRecyclerViewToScrollDownListener(OnInformRecyclerViewToScrollDownListener mOnInformRecyclerViewToScrollDownListener) {
         this.mOnInformRecyclerViewToScrollDownListener = mOnInformRecyclerViewToScrollDownListener;
     }
-
     public OnItemLongClickListener getOnItemLongClickListener() {
         return onItemLongClickListener;
     }
-
     public void setOnItemLongClickListener(OnItemLongClickListener onItemLongClickListener) {
         this.onItemLongClickListener = onItemLongClickListener;
     }
-
     public Context getContext() {
         return mContext;
     }
-
     public void setContext(Context mContext) {
         this.mContext = mContext;
     }
-
-    public ChatMessagesAdapter(Context context, String toContactJid, String fromContactJid) {
+    public ChatMessagesAdapter(Context context, String toContactJid,String fromContactJid)
+    {
         this.mLayoutInflater = LayoutInflater.from(context);
         this.mContext = context;
         this.toContactJid = toContactJid;
-        this.fromContactJid = fromContactJid;
-        mChatMessageList = ChatMessagesModel.get(context).getMessages(toContactJid, fromContactJid);
-        Log.d(LOGTAG, "Getting messages for :" + toContactJid);
+        this.fromContactJid=fromContactJid;
+        mChatMessageList = ChatMessagesModel.get(context).getMessages(toContactJid,fromContactJid);
+        Log.d(LOGTAG,"Getting messages for :"+ toContactJid);
     }
-
-    public void informRecyclerViewToScrollDown() {
+    public void informRecyclerViewToScrollDown()
+    {
         mOnInformRecyclerViewToScrollDownListener.onInformRecyclerViewToScrollDown(mChatMessageList.size());
     }
-
     @Override
     public ChatMessageViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View itemView;
-        switch (viewType) {
-            case SENT:
-                itemView = mLayoutInflater.inflate(R.layout.chat_message_sent, parent, false);
-                return new ChatMessageViewHolder(itemView, this);
+        switch (viewType)
+        {
+            case  SENT :
+                itemView = mLayoutInflater.inflate(R.layout.chat_message_sent,parent,false);
+                return new ChatMessageViewHolder(itemView,this);
             case RECEIVED:
-                itemView = mLayoutInflater.inflate(R.layout.chat_message_received, parent, false);
-                return new ChatMessageViewHolder(itemView, this);
+                itemView = mLayoutInflater.inflate(R.layout.chat_message_received,parent,false);
+                return new ChatMessageViewHolder(itemView,this);
             default:
-                itemView = mLayoutInflater.inflate(R.layout.chat_message_sent, parent, false);
-                return new ChatMessageViewHolder(itemView, this);
+                itemView = mLayoutInflater.inflate(R.layout.chat_message_sent,parent,false);
+                return new ChatMessageViewHolder(itemView,this);
         }
     }
-
     @Override
     public void onBindViewHolder(ChatMessageViewHolder holder, int position) {
-        ChatMessage chatMessage = mChatMessageList.get(position);
+        ChatMessage chatMessage =mChatMessageList.get(position);
         holder.bindChat(chatMessage);
     }
-
     @Override
     public int getItemCount() {
         return mChatMessageList.size();
     }
-
     @Override
     public int getItemViewType(int position) {
         ChatMessage.Type messageType = mChatMessageList.get(position).getType();
-        if (messageType == ChatMessage.Type.SENT) {
+        if ( messageType == ChatMessage.Type.SENT)
+        {
             return SENT;
-        } else {
+        }else{
             return RECEIVED;
         }
     }
-
     public void onMessageAdd() {
-        mChatMessageList = ChatMessagesModel.get(mContext).getMessages(toContactJid, fromContactJid);
+        mChatMessageList = ChatMessagesModel.get(mContext).getMessages(toContactJid,fromContactJid);
         notifyDataSetChanged();
         informRecyclerViewToScrollDown();
     }
 }
-
-class ChatMessageViewHolder extends RecyclerView.ViewHolder {
-    private static final String LOGTAG = "ChatMessageViewHolder";
+class ChatMessageViewHolder extends RecyclerView.ViewHolder{
+    private static final String LOGTAG = "ChatMessageViewHolder" ;
     private TextView mMessageBody, mMessageTimestamp;
     private ImageView profileImage;
     private ChatMessage mChatMessage;
     private ChatMessagesAdapter mAdapter;
-
     public ChatMessageViewHolder(final View itemView, final ChatMessagesAdapter mAdapter) {
         super(itemView);
 
@@ -153,15 +140,16 @@ class ChatMessageViewHolder extends RecyclerView.ViewHolder {
             @Override
             public boolean onLongClick(View v) {
                 ChatMessagesAdapter.OnItemLongClickListener listener = mAdapter.getOnItemLongClickListener();
-                if (listener != null) {
-                    listener.onItemLongClick(mChatMessage.getPersistID(), itemView);
+                if ( listener!=null)
+                {
+                    listener.onItemLongClick(mChatMessage.getPersistID(),itemView);
                 }
                 return false;
             }
         });
     }
-
-    public void bindChat(ChatMessage chatMessage) {
+    public void bindChat(ChatMessage chatMessage)
+    {
         mChatMessage = chatMessage;
         mMessageBody.setText(chatMessage.getMessage());
         // https://github.com/saket/Better-Link-Movement-Method
@@ -182,29 +170,37 @@ class ChatMessageViewHolder extends RecyclerView.ViewHolder {
         mMessageTimestamp.setText(Utilities.getFormattedTime(chatMessage.getTimestamp()));
         profileImage.setImageResource(R.mipmap.ic_profile);
         ChatMessage.Type type = mChatMessage.getType();
-        if (type == ChatMessage.Type.RECEIVED) {
+        if( type == ChatMessage.Type.RECEIVED)
+        {
             RoosterConnection rc = RoosterConnectionService.getConnection();
-            if (rc != null) {
+            if(rc != null)
+            {
                 String imageAbsPath = rc.getProfileImageAbsolutePath(mChatMessage.getToContactJid());
-                if (imageAbsPath != null) {
+                if ( imageAbsPath != null)
+                {
                     Drawable d = Drawable.createFromPath(imageAbsPath);
                     profileImage.setImageDrawable(d);
                 }
             }
         }
-        if (type == ChatMessage.Type.SENT) {
+        if( type == ChatMessage.Type.SENT)
+        {
             RoosterConnection rc = RoosterConnectionService.getConnection();
-            if (rc != null) {
-                String selfJid = PreferenceManager.getDefaultSharedPreferences(mAdapter.getContext()).getString("xmpp_jid", null);
-                if (selfJid != null) {
-                    Log.d(LOGTAG, "Valide SID : " + selfJid);
+            if(rc != null)
+            {
+                String selfJid = PreferenceManager.getDefaultSharedPreferences(mAdapter.getContext()).getString("xmpp_jid",null);
+                if ( selfJid != null)
+                {
+                    Log.d(LOGTAG,"Valide SID : "+ selfJid);
                     String imageAbsPath = rc.getProfileImageAbsolutePath(selfJid);
-                    if (imageAbsPath != null) {
+                    if ( imageAbsPath != null)
+                    {
                         Drawable d = Drawable.createFromPath(imageAbsPath);
                         profileImage.setImageDrawable(d);
                     }
-                } else {
-                    Log.d(LOGTAG, "Keine valide SID ");
+                }else
+                {
+                    Log.d(LOGTAG,"Keine valide SID ");
                 }
             }
         }

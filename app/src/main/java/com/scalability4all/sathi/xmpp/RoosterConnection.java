@@ -53,7 +53,6 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.InetAddress;
-import java.nio.charset.StandardCharsets;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
@@ -64,10 +63,9 @@ import javax.net.ssl.SSLSession;
 import static com.scalability4all.sathi.model.Chat.ContactType.STRANGER;
 import static com.scalability4all.sathi.services.VolleyService.UPDATE_USER_PREFERENCE_CATEGORY;
 import static com.scalability4all.sathi.services.VolleyService.POST_TRANSLATION_TEXT;
-
-public class RoosterConnection implements ConnectionListener, SubscribeListener, RosterListener {
+public class RoosterConnection implements ConnectionListener, SubscribeListener,RosterListener{
     private static final String LOGTAG = "RoosterConnection";
-    private final Context mApplicationContext;
+    private  final Context mApplicationContext;
     private String mUsername;
     private String mPassword;
     private String mServiceName;
@@ -78,36 +76,36 @@ public class RoosterConnection implements ConnectionListener, SubscribeListener,
     private Roster mRoster;
     private VCardManager vCardManager;
     private String serverurl = "localhost";
-
-    public enum ConnectionState {
-        OFFLINE, CONNECTING, ONLINE
+    public enum ConnectionState
+    {
+        OFFLINE,CONNECTING,ONLINE
     }
-
     public ConnectionState getmConnectionState() {
         return mConnectionState;
     }
-
     public void setmConnectionState(ConnectionState mConnectionState) {
         this.mConnectionState = mConnectionState;
     }
-
-    public String getConnectionStateString() {
-        switch (mConnectionState) {
+    public String getConnectionStateString()
+    {
+        switch ( mConnectionState)
+        {
             case OFFLINE:
-                return "Offline";
+                return  "Offline";
             case CONNECTING:
-                return "Connecting...";
+                return  "Connecting...";
             case ONLINE:
-                return "Online";
+                return  "Online";
             default:
-                return "Offline";
+                return  "Offline";
         }
     }
-
-    private void updateActivitiesOfConnectionStateChange(ConnectionState mConnectionState) {
+    private void updateActivitiesOfConnectionStateChange( ConnectionState mConnectionState)
+    {
         ConnectionState connectionState = mConnectionState;
         String status;
-        switch (mConnectionState) {
+        switch ( mConnectionState)
+        {
             case OFFLINE:
                 status = "Offline";
                 break;
@@ -122,21 +120,19 @@ public class RoosterConnection implements ConnectionListener, SubscribeListener,
                 break;
         }
         Intent i = new Intent(Constants.BroadCastMessages.UI_CONNECTION_STATUS_CHANGE_FLAG);
-        i.putExtra(Constants.UI_CONNECTION_STATUS_CHANGE, status);
+        i.putExtra(Constants.UI_CONNECTION_STATUS_CHANGE,status);
         i.setPackage(mApplicationContext.getPackageName());
         mApplicationContext.sendBroadcast(i);
     }
-
     public RoosterConnection(Context mApplicationContext) {
         this.mApplicationContext = mApplicationContext;
     }
-
     public void translateMessage(final String message, final String contactJid) {
-        final SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(mApplicationContext);
-        String username = prefs.getString("xmpp_jid", null);
-        String language = prefs.getString("language", null);
-        if (username != null) {
-            username = username.split("@")[0];
+        final SharedPreferences prefs=PreferenceManager.getDefaultSharedPreferences(mApplicationContext);
+        String username=prefs.getString("xmpp_jid",null);
+        String language=prefs.getString("language",null);
+        if(username!=null) {
+            username=username.split("@")[0];
         }
         HashMap data = new HashMap();
         data.put("username", username);
@@ -148,45 +144,45 @@ public class RoosterConnection implements ConnectionListener, SubscribeListener,
             @Override
             public void notifySuccess(JSONObject response) throws JSONException {
                 try {
-                    JSONObject data = response.getJSONObject("data");
+                    JSONObject data= response.getJSONObject("data");
                     String Responsetext = data.getString("text");
                     try {
-                        String EncodedString = new String(Responsetext.getBytes(StandardCharsets.UTF_8), StandardCharsets.UTF_8);
+                        String EncodedString = new String(Responsetext.getBytes("UTF-8"), "UTF-8");
                         Log.d(LOGTAG, response.toString());
                         Log.d(LOGTAG, Responsetext);
                         Log.d(LOGTAG, EncodedString);
                         Log.d(LOGTAG, "मस्ते");
                         //EncodedString = "मस्ते";
-                        UpdateMessagePanel(EncodedString, contactJid, prefs.getString("xmpp_jid", null));
-                    } catch (Exception e) {
+                        UpdateMessagePanel(EncodedString, contactJid,prefs.getString("xmpp_jid",null));
+                    }
+                    catch (Exception e){
 
                     }
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
             }
-
             @Override
             public void notifyError(JSONObject error) {
                 try {
-                    Log.d(LOGTAG, "Category updation failed");
-                    Log.d(LOGTAG, error.getString("data"));
-                    UpdateMessagePanel(message, contactJid, prefs.getString("xmpp_jid", null));
+                    Log.d(LOGTAG,"Category updation failed");
+                    Log.d(LOGTAG,error.getString("data"));
+                    UpdateMessagePanel(message, contactJid,prefs.getString("xmpp_jid",null));
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
             }
-        }, mApplicationContext);
-        mVolleyService.postDataVolley(POST_TRANSLATION_TEXT, data);
+        },mApplicationContext);
+        mVolleyService.postDataVolley(POST_TRANSLATION_TEXT,data);
     }
-
-    public void UpdateMessagePanel(String messageBody, String contactJid, String fromContactJid) {
-        ChatMessagesModel.get(mApplicationContext).addMessage(new ChatMessage(messageBody, System.currentTimeMillis(), ChatMessage.Type.RECEIVED, contactJid, fromContactJid));
-        if (ContactModel.get(mApplicationContext).isContactStranger(contactJid)) {
-            List<com.scalability4all.sathi.model.Chat> chats = ChatModel.get(mApplicationContext).getChatsByJid(contactJid, fromContactJid);
-            if (chats.size() == 0) {
+    public void UpdateMessagePanel(String messageBody, String contactJid,String fromContactJid){
+        ChatMessagesModel.get(mApplicationContext).addMessage(new ChatMessage(messageBody, System.currentTimeMillis(), ChatMessage.Type.RECEIVED,contactJid,fromContactJid));
+        if ( ContactModel.get(mApplicationContext).isContactStranger(contactJid))
+        {
+            List<com.scalability4all.sathi.model.Chat> chats = ChatModel.get(mApplicationContext).getChatsByJid(contactJid,fromContactJid);
+            if( chats.size() == 0) {
                 Log.d(LOGTAG, contactJid + " neuer Chat, Timestamp :" + Utilities.getFormattedTime(System.currentTimeMillis()));
-                com.scalability4all.sathi.model.Chat chatRooster = new com.scalability4all.sathi.model.Chat(contactJid, fromContactJid, messageBody, com.scalability4all.sathi.model.Chat.ContactType.ONE_ON_ONE, System.currentTimeMillis(), 0);
+                com.scalability4all.sathi.model.Chat chatRooster = new com.scalability4all.sathi.model.Chat(contactJid,fromContactJid, messageBody, com.scalability4all.sathi.model.Chat.ContactType.ONE_ON_ONE, System.currentTimeMillis(), 0);
                 ChatModel.get(mApplicationContext).addChat(chatRooster);
                 Intent intent = new Intent(Constants.BroadCastMessages.UI_NEW_CHAT_ITEM);
                 intent.setPackage(mApplicationContext.getPackageName());
@@ -194,13 +190,13 @@ public class RoosterConnection implements ConnectionListener, SubscribeListener,
             }
         }
         Intent intent = new Intent(Constants.BroadCastMessages.UI_NEW_MESSAGE_FLAG);
-        Log.d(LOGTAG, "package name :" + mApplicationContext.getPackageName());
+        Log.d(LOGTAG, "package name :"+mApplicationContext.getPackageName());
         intent.setPackage(mApplicationContext.getPackageName());
         intent.putExtra("JabberId", contactJid);
         mApplicationContext.sendBroadcast(intent);
     }
-
-    public void connect() throws IOException, XMPPException, SmackException {
+    public void connect() throws IOException,XMPPException,SmackException
+    {
         mConnectionState = ConnectionState.CONNECTING;
         updateActivitiesOfConnectionStateChange(ConnectionState.CONNECTING);
         gatherCredentials();
@@ -233,21 +229,23 @@ public class RoosterConnection implements ConnectionListener, SubscribeListener,
         mRoster.setSubscriptionMode(Roster.SubscriptionMode.manual);
         mRoster.addSubscribeListener(this);
         mRoster.addRosterListener(this);
-        vCardManager = VCardManager.getInstanceFor(mConnection);
+        vCardManager  = VCardManager.getInstanceFor(mConnection);
         chatManager = ChatManager.getInstanceFor(mConnection);
         chatManager.addIncomingListener(new IncomingChatMessageListener() {
             @Override
             public void newIncomingMessage(EntityBareJid from, Message message, Chat chat) {
-                Log.d(LOGTAG, "message.getBody() :" + message.getBody());
-                Log.d(LOGTAG, "message.getFrom() :" + message.getFrom());
+                Log.d(LOGTAG,"message.getBody() :"+message.getBody());
+                Log.d(LOGTAG,"message.getFrom() :"+message.getFrom());
                 String messageSource = message.getFrom().toString();
-                String contactJid = "";
-                if (messageSource.contains("/")) {
+                String contactJid="";
+                if ( messageSource.contains("/"))
+                {
                     contactJid = messageSource.split("/")[0];
-                    Log.d(LOGTAG, "The real jid is :" + contactJid);
-                    Log.d(LOGTAG, "The message is from :" + from);
-                } else {
-                    contactJid = messageSource;
+                    Log.d(LOGTAG,"The real jid is :" +contactJid);
+                    Log.d(LOGTAG,"The message is from :" +from);
+                }else
+                {
+                    contactJid=messageSource;
                 }
                 String messageBody = message.getBody();
                 translateMessage(messageBody, contactJid);
@@ -259,7 +257,7 @@ public class RoosterConnection implements ConnectionListener, SubscribeListener,
         try {
             Log.d(LOGTAG, "Calling connect() ");
             mConnection.connect();
-            mConnection.login(mUsername, mPassword);
+            mConnection.login(mUsername,mPassword);
             Log.d(LOGTAG, " login() Called ");
             syncContactListWithRemoteRoster();
             saveUserAvatarsLocaly();
@@ -267,11 +265,12 @@ public class RoosterConnection implements ConnectionListener, SubscribeListener,
             e.printStackTrace();
         }
     }
-
-    public boolean setSelfAvatar(byte[] image) {
+    public boolean setSelfAvatar( byte[] image)
+    {
         VCard vCard = new VCard();
         vCard.setAvatar(image);
-        if (vCardManager != null) {
+        if( vCardManager != null)
+        {
             try {
                 vCardManager.saveVCard(vCard);
             } catch (SmackException.NoResponseException e) {
@@ -287,25 +286,29 @@ public class RoosterConnection implements ConnectionListener, SubscribeListener,
                 e.printStackTrace();
                 return false;
             }
-            return true;
-        } else {
+            return  true;
+        }else
+        {
             return false;
         }
     }
-
-    public void saveUserAvatarsLocaly() {
-        Log.d(LOGTAG, "Profilbild wird lokal gespeichert");
-        File rootPath = new File(mApplicationContext.getExternalFilesDir("DIRECTORY_PICTURES"), "profile_pictures");
+    public void saveUserAvatarsLocaly ()
+    {
+        Log.d(LOGTAG,"Profilbild wird lokal gespeichert");
+        File rootPath = new File(mApplicationContext.getExternalFilesDir("DIRECTORY_PICTURES") , "profile_pictures");
         if (!rootPath.exists()) {
-            if (rootPath.mkdirs()) {
-                Log.d(LOGTAG, "Directory erstellt :" + rootPath.getAbsolutePath());
-            } else {
-                Log.d(LOGTAG, "Directory konnte nicht erstellt werden :" + rootPath.getAbsolutePath());
+            if(rootPath.mkdirs())
+            {
+                Log.d(LOGTAG,"Directory erstellt :"+ rootPath.getAbsolutePath());
+            }else
+            {
+                Log.d(LOGTAG,"Directory konnte nicht erstellt werden :"+ rootPath.getAbsolutePath());
             }
         }
-        String selfJid = PreferenceManager.getDefaultSharedPreferences(mApplicationContext).getString("xmpp_jid", null);
-        if (selfJid != null) {
-            Log.d(LOGTAG, "Valide sid :" + selfJid);
+        String selfJid = PreferenceManager.getDefaultSharedPreferences(mApplicationContext).getString("xmpp_jid",null);
+        if( selfJid != null)
+        {
+            Log.d(LOGTAG,"Valide sid :"+selfJid);
             VCard vCard = null;
             try {
                 vCard = vCardManager.loadVCard();
@@ -318,11 +321,13 @@ public class RoosterConnection implements ConnectionListener, SubscribeListener,
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
-            if (vCard != null) {
-                saveAvatarToDisk(vCard, rootPath, selfJid);
+            if( vCard != null)
+            {
+                saveAvatarToDisk(vCard,rootPath,selfJid);
             }
-        } else {
-            Log.d(LOGTAG, "Self jid NULL");
+        }else
+        {
+            Log.d(LOGTAG,"Self jid NULL");
         }
         List<String> contacts = ContactModel.get(mApplicationContext).getContactsJidStrings();
 //        for ( String contact : contacts)
@@ -334,34 +339,39 @@ public class RoosterConnection implements ConnectionListener, SubscribeListener,
 //            }
 //        }
     }
-
-    private void saveAvatarToDisk(VCard vCard, File rootPath, String contact) {
+    private void saveAvatarToDisk(VCard vCard , File rootPath , String contact)
+    {
         String imageMimeType = null;
         String imageExtension = null;
         Bitmap.CompressFormat format = null;
-        if (vCard != null) {
-            byte[] image_data = vCard.getAvatar();
+        if( vCard != null)
+        {
+            byte [] image_data = vCard.getAvatar();
             imageMimeType = vCard.getAvatarMimeType();
-            if (image_data != null) {
-                Log.d(LOGTAG, "Avatar gefunden : " + contact);
-                if (imageMimeType.equals("image/jpeg")) {
-                    Log.d(LOGTAG, "Bild JPEG");
+            if( image_data != null)
+            {
+                Log.d(LOGTAG,"Avatar gefunden : "+ contact);
+                if ( imageMimeType.equals("image/jpeg"))
+                {
+                    Log.d(LOGTAG,"Bild JPEG");
                     imageExtension = "jpeg";
                     format = Bitmap.CompressFormat.JPEG;
-                } else if (imageMimeType.equals("image/jpg")) {
-                    Log.d(LOGTAG, "Bild JPG");
+                }else if( imageMimeType.equals("image/jpg"))
+                {
+                    Log.d(LOGTAG,"Bild JPG");
                     imageExtension = "jpg";
                     format = Bitmap.CompressFormat.JPEG;
-                } else if (imageMimeType.equals("image/png")) {
-                    Log.d(LOGTAG, "Bild PNG");
+                }else if( imageMimeType.equals("image/png"))
+                {
+                    Log.d(LOGTAG,"Bild PNG");
                     imageExtension = "png";
                     format = Bitmap.CompressFormat.PNG;
                 }
                 Bitmap bitmap = BitmapFactory.decodeByteArray(image_data, 0, image_data.length);
-                Bitmap bpResized = Bitmap.createScaledBitmap(bitmap, 70, 70, false);
-                File file = new File(rootPath, contact + "." + imageExtension);
-                if (file.exists())
-                    file.delete();
+                Bitmap bpResized = bitmap.createScaledBitmap(bitmap,70,70,false);
+                File file = new File(rootPath, contact+"."+imageExtension);
+                if (file.exists ())
+                    file.delete ();
                 try {
                     FileOutputStream out = new FileOutputStream(file);
                     bpResized.compress(format, 90, out);
@@ -370,22 +380,24 @@ public class RoosterConnection implements ConnectionListener, SubscribeListener,
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
-                Log.d(LOGTAG, "Bild erfolgreich geschrieben :" + file.getAbsolutePath());
-            } else {
-                Log.d(LOGTAG, "Avatar nicht möglich : " + contact);
+                Log.d(LOGTAG,"Bild erfolgreich geschrieben :" + file.getAbsolutePath());
+            }else
+            {
+                Log.d(LOGTAG,"Avatar nicht möglich : "+contact);
             }
         }
     }
-
-    public VCard getUserVCard(String user) {
+    public VCard getUserVCard ( String user)
+    {
         EntityBareJid jid = null;
         try {
-            jid = JidCreate.entityBareFrom(user);
+            jid =JidCreate.entityBareFrom(user);
         } catch (XmppStringprepException e) {
             e.printStackTrace();
         }
-        VCard vCard = null;
-        if (vCardManager != null) {
+        VCard vCard =  null;
+        if(vCardManager != null)
+        {
             try {
                 vCard = vCardManager.loadVCard(jid);
             } catch (SmackException.NoResponseException e) {
@@ -398,53 +410,69 @@ public class RoosterConnection implements ConnectionListener, SubscribeListener,
                 e.printStackTrace();
             }
         }
-        return vCard;
+        if( vCard != null)
+        {
+            return vCard;
+        }
+        return null;
     }
-
-    public String getProfileImageAbsolutePath(String jid) {
-        File rootPath = new File(mApplicationContext.getExternalFilesDir("DIRECTORY_PICTURES"), "profile_pictures");
+    public String getProfileImageAbsolutePath(String jid)
+    {
+        File rootPath = new File(mApplicationContext.getExternalFilesDir("DIRECTORY_PICTURES") , "profile_pictures");
         if (!rootPath.exists()) {
-            if (rootPath.mkdirs()) {
-                Log.d(LOGTAG, "Directory erstellt :" + rootPath.getAbsolutePath());
-            } else {
-                Log.d(LOGTAG, "Directory konnte nicht erstellt werden :" + rootPath.getAbsolutePath());
+            if(rootPath.mkdirs())
+            {
+                Log.d(LOGTAG,"Directory erstellt :"+ rootPath.getAbsolutePath());
+            }else
+            {
+                Log.d(LOGTAG,"Directory konnte nicht erstellt werden :"+ rootPath.getAbsolutePath());
             }
         }
-        File file = new File(rootPath, jid + ".jpeg");
-        if (!file.exists()) {
-            file = new File(rootPath, jid + ".jpg");
-            if (!file.exists()) {
-                file = new File(rootPath, jid + ".png");
-                if (!file.exists()) {
+        File file = new File(rootPath, jid+".jpeg");
+        if( !file.exists())
+        {
+            file = new File( rootPath, jid + ".jpg");
+            if ( !file.exists())
+            {
+                file = new File(rootPath,jid+".png");
+                if ( !file.exists())
+                {
                     return null;
-                } else {
+                }else
+                {
                     return file.getAbsolutePath();
                 }
-            } else {
+            }else
+            {
                 return file.getAbsolutePath();
             }
-        } else {
+        }else
+        {
             return file.getAbsolutePath();
         }
     }
-
-    public void syncContactListWithRemoteRoster() {
-        Log.d(LOGTAG, "Roster SYNCING...");
+    public void syncContactListWithRemoteRoster()
+    {
+        Log.d(LOGTAG,"Roster SYNCING...");
         Collection<RosterEntry> entries = getRosterEntries();
-        Log.d(LOGTAG, "Roster von Server " + entries.size() + " Kontakte in Rooster");
+        Log.d(LOGTAG,"Roster von Server "+entries.size() + " Kontakte in Rooster");
         for (RosterEntry entry : entries) {
-            RosterPacket.ItemType itemType = entry.getType();
-            Log.d(LOGTAG, "Eintrag " + entry.getJid() + " hat subscription " + entry.getType());
+            RosterPacket.ItemType itemType=   entry.getType();
+            Log.d(LOGTAG,"Eintrag "+ entry.getJid() + " hat subscription "+entry.getType());
             List<String> contacts = ContactModel.get(mApplicationContext).getContactsJidStrings();
-            if ((!contacts.contains(entry.getJid().toString())) && (itemType != RosterPacket.ItemType.none)) {
-                if (ContactModel.get(mApplicationContext).addContact(new Contact(entry.getJid().toString(),
-                        rosterItemTypeToContactSubscriptionType(itemType)))) {
-                    Log.d(LOGTAG, "Neuer Kontakt " + entry.getJid().toString() + "hinzugefügt");
-                } else {
-                    Log.d(LOGTAG, "Kontakt konnte nicht hinzugefügt werden " + entry.getJid().toString());
+            if( (!contacts.contains(entry.getJid().toString())) && (itemType!=RosterPacket.ItemType.none))
+            {
+                if(ContactModel.get(mApplicationContext).addContact(new Contact(entry.getJid().toString(),
+                        rosterItemTypeToContactSubscriptionType(itemType))))
+                {
+                    Log.d(LOGTAG,"Neuer Kontakt "+entry.getJid().toString() +"hinzugefügt");
+                }else
+                {
+                    Log.d(LOGTAG,"Kontakt konnte nicht hinzugefügt werden "+entry.getJid().toString());
                 }
             }
-            if ((contacts.contains(entry.getJid().toString()))) {
+            if( (contacts.contains(entry.getJid().toString())))
+            {
                 Contact.SubscriptionType subscriptionType = rosterItemTypeToContactSubscriptionType(itemType);
                 boolean isSubscriptionPending = entry.isSubscriptionPending();
                 Contact mContact = ContactModel.get(mApplicationContext).getContactByJidString(entry.getJid().toString());
@@ -454,24 +482,25 @@ public class RoosterConnection implements ConnectionListener, SubscribeListener,
             }
         }
     }
-
-    public Collection<RosterEntry> getRosterEntries() {
+    public Collection<RosterEntry> getRosterEntries()
+    {
         Collection<RosterEntry> entries = mRoster.getEntries();
-        Log.d(LOGTAG, "Benutzer hat " + entries.size() + " Kontakte in Roster");
-        return entries;
+        Log.d(LOGTAG,"Benutzer hat "+entries.size() + " Kontakte in Roster");
+        return  entries;
     }
-
-    public void disconnect() {
-        Log.d(LOGTAG, "Disconnect Server " + mServiceName);
+    public void disconnect ()
+    {
+        Log.d(LOGTAG,"Disconnect Server "+ mServiceName);
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(mApplicationContext);
-        prefs.edit().putBoolean("xmpp_logged_in", false).commit();
-        if (mConnection != null) {
+        prefs.edit().putBoolean("xmpp_logged_in",false).commit();
+        if (mConnection != null)
+        {
             mConnection.disconnect();
         }
     }
-
-    public void sendMessage(String body, String toJid, String fromJid) {
-        Log.d(LOGTAG, "Nachricht wird gesendet zu: :" + toJid);
+    public void sendMessage (String body , String toJid, String fromJid)
+    {
+        Log.d(LOGTAG,"Nachricht wird gesendet zu: :"+ toJid);
         EntityBareJid jid = null;
         try {
             jid = JidCreate.entityBareFrom(toJid);
@@ -483,15 +512,15 @@ public class RoosterConnection implements ConnectionListener, SubscribeListener,
             Message message = new Message(jid, Message.Type.chat);
             message.setBody(body);
             chat.send(message);
-            ChatMessagesModel.get(mApplicationContext).addMessage(new ChatMessage(body, System.currentTimeMillis(), ChatMessage.Type.SENT, toJid, fromJid));
+            ChatMessagesModel.get(mApplicationContext).addMessage(new ChatMessage(body, System.currentTimeMillis(), ChatMessage.Type.SENT,toJid,fromJid));
         } catch (SmackException.NotConnectedException e) {
             e.printStackTrace();
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
     }
-
-    public boolean addContactToRoster(String contactJid) {
+    public boolean addContactToRoster(String contactJid)
+    {
         Jid jid;
         try {
             jid = JidCreate.from(contactJid);
@@ -500,7 +529,7 @@ public class RoosterConnection implements ConnectionListener, SubscribeListener,
             return false;
         }
         try {
-            mRoster.createEntry(jid.asBareJid(), "", null);
+            mRoster.createEntry(jid.asBareJid(),"",null);
         } catch (SmackException.NotLoggedInException e) {
             e.printStackTrace();
             return false;
@@ -519,21 +548,28 @@ public class RoosterConnection implements ConnectionListener, SubscribeListener,
         }
         return true;
     }
-
-    private Contact.SubscriptionType rosterItemTypeToContactSubscriptionType(RosterPacket.ItemType itemType) {
-        if (itemType == RosterPacket.ItemType.none) {
+    private Contact.SubscriptionType rosterItemTypeToContactSubscriptionType(RosterPacket.ItemType itemType)
+    {
+        if(itemType == RosterPacket.ItemType.none)
+        {
             return Contact.SubscriptionType.NONE;
-        } else if (itemType == RosterPacket.ItemType.from) {
+        }
+        else if(itemType == RosterPacket.ItemType.from)
+        {
             return Contact.SubscriptionType.FROM;
-        } else if (itemType == RosterPacket.ItemType.to) {
+        }
+        else if(itemType == RosterPacket.ItemType.to)
+        {
             return Contact.SubscriptionType.TO;
-        } else if (itemType == RosterPacket.ItemType.both) {
+        }
+        else if(itemType == RosterPacket.ItemType.both)
+        {
             return Contact.SubscriptionType.BOTH;
-        } else
+        }else
             return Contact.SubscriptionType.NONE;
     }
-
-    public boolean subscribe(String contact) {
+    public boolean subscribe (String contact)
+    {
         Jid jidTo = null;
         try {
             jidTo = JidCreate.from(contact);
@@ -542,10 +578,16 @@ public class RoosterConnection implements ConnectionListener, SubscribeListener,
             return false;
         }
         Presence subscribe = new Presence(jidTo, Presence.Type.subscribe);
-        return sendPresense(subscribe);
+        if(sendPresense(subscribe))
+        {
+            return true;
+        }else
+        {
+            return false;
+        }
     }
-
-    public boolean unsubscribe(String contact) {
+    public boolean unsubscribe(String contact)
+    {
         Jid jidTo = null;
         try {
             jidTo = JidCreate.from(contact);
@@ -554,10 +596,16 @@ public class RoosterConnection implements ConnectionListener, SubscribeListener,
             return false;
         }
         Presence unsubscribe = new Presence(jidTo, Presence.Type.unsubscribe);
-        return sendPresense(unsubscribe);
+        if(sendPresense(unsubscribe))
+        {
+            return true;
+        }else
+        {
+            return false;
+        }
     }
-
-    public boolean unsubscribed(String contact) {
+    public boolean unsubscribed(String contact)
+    {
         Jid jidTo = null;
         try {
             jidTo = JidCreate.from(contact);
@@ -566,10 +614,16 @@ public class RoosterConnection implements ConnectionListener, SubscribeListener,
             return false;
         }
         Presence unsubscribed = new Presence(jidTo, Presence.Type.unsubscribed);
-        return sendPresense(unsubscribed);
+        if(sendPresense(unsubscribed))
+        {
+            return true;
+        }else
+        {
+            return false;
+        }
     }
-
-    public boolean subscribed(String contact) {
+    public boolean subscribed(String contact)
+    {
         Jid jidTo = null;
         try {
             jidTo = JidCreate.from(contact);
@@ -581,8 +635,8 @@ public class RoosterConnection implements ConnectionListener, SubscribeListener,
         sendPresense(subscribe);
         return true;
     }
-
-    public boolean removeRosterEntry(String contactJid) {
+    public boolean removeRosterEntry(String contactJid)
+    {
         Jid jid;
         try {
             jid = JidCreate.from(contactJid);
@@ -611,9 +665,10 @@ public class RoosterConnection implements ConnectionListener, SubscribeListener,
         }
         return true;
     }
-
-    public boolean sendPresense(Presence presence) {
-        if (mConnection != null) {
+    public boolean sendPresense(Presence presence)
+    {
+        if(mConnection != null)
+        {
             try {
                 mConnection.sendStanza(presence);
             } catch (SmackException.NotConnectedException e) {
@@ -627,120 +682,120 @@ public class RoosterConnection implements ConnectionListener, SubscribeListener,
         }
         return false;
     }
-
-    private void gatherCredentials() {
-        String jid = PreferenceManager.getDefaultSharedPreferences(mApplicationContext).getString("xmpp_jid", null);
-        mPassword = PreferenceManager.getDefaultSharedPreferences(mApplicationContext).getString("xmpp_password", null);
-        if (jid != null) {
+    private void gatherCredentials()
+    {
+        String jid = PreferenceManager.getDefaultSharedPreferences(mApplicationContext).getString("xmpp_jid",null);
+        mPassword = PreferenceManager.getDefaultSharedPreferences(mApplicationContext).getString("xmpp_password",null);
+        if( jid != null)
+        {
             mUsername = jid.split("@")[0];
-            mServiceName = jid.split("@").length > 1 ? jid.split("@")[1] : "";
-        } else {
-            mUsername = "";
-            mServiceName = "";
+            mServiceName = jid.split("@").length>1?jid.split("@")[1]:"";
+        }else
+        {
+            mUsername ="";
+            mServiceName="";
         }
     }
-
-    private void notifyUiForConnectionError() {
+    private void notifyUiForConnectionError()
+    {
         Intent i = new Intent(Constants.BroadCastMessages.UI_CONNECTION_ERROR);
         i.setPackage(mApplicationContext.getPackageName());
         mApplicationContext.sendBroadcast(i);
     }
-
     @Override
     public void connected(XMPPConnection connection) {
-        Log.d(LOGTAG, "Connected");
+        Log.d(LOGTAG,"Connected");
         mConnectionState = ConnectionState.CONNECTING;
         updateActivitiesOfConnectionStateChange(ConnectionState.CONNECTING);
     }
-
     @Override
     public void authenticated(XMPPConnection connection, boolean resumed) {
         mConnectionState = ConnectionState.ONLINE;
         updateActivitiesOfConnectionStateChange(ConnectionState.ONLINE);
-        Log.d(LOGTAG, "Authenticated");
+        Log.d(LOGTAG,"Authenticated");
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(mApplicationContext);
-        prefs.edit().putBoolean("xmpp_logged_in", true).commit();
+        prefs.edit().putBoolean("xmpp_logged_in",true).commit();
         Intent i = new Intent(Constants.BroadCastMessages.UI_AUTHENTICATED);
         i.setPackage(mApplicationContext.getPackageName());
         mApplicationContext.sendBroadcast(i);
     }
-
     @Override
     public void connectionClosed() {
-        Log.d(LOGTAG, "connectionClosed");
+        Log.d(LOGTAG,"connectionClosed");
         notifyUiForConnectionError();
         mConnectionState = ConnectionState.OFFLINE;
         updateActivitiesOfConnectionStateChange(ConnectionState.OFFLINE);
     }
-
     @Override
     public void connectionClosedOnError(Exception e) {
-        Log.d(LOGTAG, "connectionClosedOnError");
+        Log.d(LOGTAG,"connectionClosedOnError");
         notifyUiForConnectionError();
         mConnectionState = ConnectionState.OFFLINE;
         updateActivitiesOfConnectionStateChange(ConnectionState.OFFLINE);
     }
-
     @Override
     public void reconnectionSuccessful() {
-        Log.d(LOGTAG, "reconnectionSuccessful");
+        Log.d(LOGTAG,"reconnectionSuccessful");
         mConnectionState = ConnectionState.ONLINE;
         updateActivitiesOfConnectionStateChange(ConnectionState.ONLINE);
     }
-
     @Override
     public void reconnectingIn(int seconds) {
-        Log.d(LOGTAG, "Reconnecting in " + seconds + "seconds");
+        Log.d(LOGTAG,"Reconnecting in " + seconds + "seconds");
         mConnectionState = ConnectionState.CONNECTING;
         updateActivitiesOfConnectionStateChange(ConnectionState.CONNECTING);
     }
-
     @Override
     public void reconnectionFailed(Exception e) {
-        Log.d(LOGTAG, "reconnectionFailed");
+        Log.d(LOGTAG,"reconnectionFailed");
         mConnectionState = ConnectionState.OFFLINE;
         updateActivitiesOfConnectionStateChange(ConnectionState.OFFLINE);
     }
-
     @Override
     public SubscribeAnswer processSubscribe(Jid from, Presence subscribeRequest) {
-        final SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(mApplicationContext);
-        String username = prefs.getString("xmpp_jid", null);
-        if (!ContactModel.get(mApplicationContext).isContactStranger(from.toString())) {
-            Log.d(LOGTAG, "Kontakt kein Unbekannter");
-            Contact mContact = ContactModel.get(mApplicationContext).getContactByJidString(from.toString());
+        final SharedPreferences prefs=PreferenceManager.getDefaultSharedPreferences(mApplicationContext);
+        String username=prefs.getString("xmpp_jid",null);
+        if(!ContactModel.get(mApplicationContext).isContactStranger(from.toString()))
+        {
+            Log.d(LOGTAG,"Kontakt kein Unbekannter");
+            Contact mContact =ContactModel.get(mApplicationContext).getContactByJidString(from.toString());
             mContact.setPendingFrom(true);
             ContactModel.get(mApplicationContext).updateContactSubscription(mContact);
-        } else {
-            List<com.scalability4all.sathi.model.Chat> chats = ChatModel.get(mApplicationContext).getChatsByJid(from.toString(), username);
-            if (chats.size() == 0) {
-                if (ChatModel.get(mApplicationContext).addChat(new com.scalability4all.sathi.model.Chat(from.toString(), username, "Subscription Request", STRANGER,
-                        System.currentTimeMillis(), 1))) {
-                    Log.d(LOGTAG, "Chat für unbekannten " + from.toString() + " hinzugefügt");
+        }else {
+            List<com.scalability4all.sathi.model.Chat> chats = ChatModel.get(mApplicationContext).getChatsByJid(from.toString(),username);
+            if( chats.size() == 0) {
+                if(ChatModel.get(mApplicationContext).addChat(new com.scalability4all.sathi.model.Chat(from.toString(),username,"Subscription Request",STRANGER,
+                        System.currentTimeMillis(),1)))
+                {
+                    Log.d(LOGTAG,"Chat für unbekannten "+from.toString() + " hinzugefügt");
                 }
             }
         }
         return null;
     }
-
     @Override
     public void entriesAdded(Collection<Jid> addresses) {
-        for (Jid jid : addresses) {
+        for( Jid jid : addresses)
+        {
             RosterEntry entry = mRoster.getEntry(jid.asBareJid());
-            RosterPacket.ItemType itemType = entry.getType();
+            RosterPacket.ItemType itemType= entry.getType();
             boolean isSubscriptionPending = entry.isSubscriptionPending();
             List<String> contacts = ContactModel.get(mApplicationContext).getContactsJidStrings();
-            if ((!contacts.contains(entry.getJid().toString()))
-                    && (itemType != RosterPacket.ItemType.none)) {
+            if( (!contacts.contains(entry.getJid().toString()))
+                    && (itemType!=RosterPacket.ItemType.none))
+            {
                 Contact mContact = new Contact(entry.getJid().toString(), rosterItemTypeToContactSubscriptionType(itemType));
                 mContact.setPendingTo(isSubscriptionPending);
-                if (ContactModel.get(mApplicationContext).addContact(mContact)) {
-                    Log.d(LOGTAG, "Neuer Kontakt " + entry.getJid().toString() + "hinzugefügt");
-                } else {
-                    Log.d(LOGTAG, "Kontakt konnte nicht hinzugefügt werden " + entry.getJid().toString());
+                if(ContactModel.get(mApplicationContext).addContact(mContact))
+                {
+                    Log.d(LOGTAG,"Neuer Kontakt "+entry.getJid().toString() +"hinzugefügt");
+                }else
+                {
+                    Log.d(LOGTAG,"Kontakt konnte nicht hinzugefügt werden "+entry.getJid().toString());
                 }
             }
-            if ((contacts.contains(entry.getJid().toString()))) {
+            if( (contacts.contains(entry.getJid().toString())))
+            {
                 Contact.SubscriptionType subscriptionType = rosterItemTypeToContactSubscriptionType(itemType);
                 Contact mContact = ContactModel.get(mApplicationContext).getContactByJidString(entry.getJid().toString());
                 mContact.setPendingTo(isSubscriptionPending);
@@ -749,15 +804,16 @@ public class RoosterConnection implements ConnectionListener, SubscribeListener,
             }
         }
     }
-
     @Override
     public void entriesUpdated(Collection<Jid> addresses) {
-        for (Jid jid : addresses) {
+        for( Jid jid : addresses)
+        {
             RosterEntry entry = mRoster.getEntry(jid.asBareJid());
-            RosterPacket.ItemType itemType = entry.getType();
+            RosterPacket.ItemType itemType= entry.getType();
             boolean isSubscriptionPending = entry.isSubscriptionPending();
             List<String> contacts = ContactModel.get(mApplicationContext).getContactsJidStrings();
-            if ((contacts.contains(entry.getJid().toString()))) {
+            if( (contacts.contains(entry.getJid().toString())))
+            {
                 Contact.SubscriptionType subscriptionType = rosterItemTypeToContactSubscriptionType(itemType);
                 Contact mContact = ContactModel.get(mApplicationContext).getContactByJidString(entry.getJid().toString());
                 mContact.setPendingTo(isSubscriptionPending);
@@ -766,31 +822,34 @@ public class RoosterConnection implements ConnectionListener, SubscribeListener,
             }
         }
     }
-
     @Override
     public void entriesDeleted(Collection<Jid> addresses) {
-        for (Jid jid : addresses) {
-            if (!ContactModel.get(mApplicationContext).isContactStranger(jid.toString())) {
+        for( Jid jid : addresses)
+        {
+            if(!ContactModel.get(mApplicationContext).isContactStranger(jid.toString()))
+            {
                 Contact mContact = ContactModel.get(mApplicationContext).getContactByJidString(jid.toString());
-                if (ContactModel.get(mApplicationContext).deleteContact(mContact)) {
-                    Log.d(LOGTAG, "Kontakt " + jid.toString() + " aus Datenbank entfernt");
+                if(ContactModel.get(mApplicationContext).deleteContact(mContact))
+                {
+                    Log.d(LOGTAG,"Kontakt "+jid.toString() + " aus Datenbank entfernt");
                 }
             }
         }
     }
-
     @Override
     public void presenceChanged(Presence presence) {
-        Presence mPresence = mRoster.getPresence(presence.getFrom().asBareJid());
+        Presence mPresence =mRoster.getPresence(presence.getFrom().asBareJid());
         Contact mContact = ContactModel.get(mApplicationContext).getContactByJidString(presence.getFrom().asBareJid().toString());
-        if (mPresence.isAvailable() && (!mPresence.isAway())) {
+        if(mPresence.isAvailable() && (!mPresence.isAway()))
+        {
             mContact.setOnlineStatus(true);
-        } else {
+        }else
+        {
             mContact.setOnlineStatus(false);
         }
         ContactModel.get(mApplicationContext).updateContactSubscription(mContact);
         Intent intent = new Intent(Constants.BroadCastMessages.UI_ONLINE_STATUS_CHANGE);
-        intent.putExtra(Constants.ONLINE_STATUS_CHANGE_CONTACT, presence.getFrom().asBareJid().toString());
+        intent.putExtra(Constants.ONLINE_STATUS_CHANGE_CONTACT,presence.getFrom().asBareJid().toString());
         intent.setPackage(mApplicationContext.getPackageName());
         mApplicationContext.sendBroadcast(intent);
     }
