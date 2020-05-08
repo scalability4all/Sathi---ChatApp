@@ -25,7 +25,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.FileNotFoundException;
 
 public class MeActivity extends AppCompatActivity implements View.OnClickListener {
-    private static final String LOGTAG = "MeActivity" ;
+    private static final String LOGTAG = "MeActivity";
     private BroadcastReceiver mBroadcastReceiver;
     private TextView connectionStatusTextView;
     private ImageView profileImageView;
@@ -38,21 +38,18 @@ public class MeActivity extends AppCompatActivity implements View.OnClickListene
         String status;
         RoosterConnection connection = RoosterConnectionService.getConnection();
         connectionStatusTextView = findViewById(R.id.connection_status);
-        if(  connection != null)
-        {
+        if (connection != null) {
             status = connection.getConnectionStateString();
             connectionStatusTextView.setText(status);
         }
         profileImageView = findViewById(R.id.profile_image);
         profileImageView.setOnClickListener(this);
-        String selfJid = PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).getString("xmpp_jid",null);
+        String selfJid = PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).getString("xmpp_jid", null);
         RoosterConnection rc = RoosterConnectionService.getConnection();
         profileImageView.setImageResource(R.mipmap.ic_profile);
-        if(rc != null)
-        {
+        if (rc != null) {
             String imageAbsPath = rc.getProfileImageAbsolutePath(selfJid);
-            if ( imageAbsPath != null)
-            {
+            if (imageAbsPath != null) {
                 Drawable d = Drawable.createFromPath(imageAbsPath);
                 profileImageView.setImageDrawable(d);
             }
@@ -72,8 +69,7 @@ public class MeActivity extends AppCompatActivity implements View.OnClickListene
             @Override
             public void onReceive(Context context, Intent intent) {
                 String action = intent.getAction();
-                switch (action)
-                {
+                switch (action) {
                     case Constants.BroadCastMessages.UI_CONNECTION_STATUS_CHANGE_FLAG:
                         String status = intent.getStringExtra(Constants.UI_CONNECTION_STATUS_CHANGE);
                         connectionStatusTextView.setText(status);
@@ -89,7 +85,7 @@ public class MeActivity extends AppCompatActivity implements View.OnClickListene
     //OnClick for profile pictures
     @Override
     public void onClick(View v) {
-        Log.d(LOGTAG,"Profile picture clicked");
+        Log.d(LOGTAG, "Profile picture clicked");
         Intent photoPickerIntent = new Intent(Intent.ACTION_PICK);
         photoPickerIntent.setType("image/*");
         startActivityForResult(photoPickerIntent, SELECT_PHOTO);
@@ -99,10 +95,10 @@ public class MeActivity extends AppCompatActivity implements View.OnClickListene
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        switch(requestCode) {
+        switch (requestCode) {
             case SELECT_PHOTO:
-                if(resultCode == RESULT_OK){
-                    Log.d(LOGTAG,"Result OK");
+                if (resultCode == RESULT_OK) {
+                    Log.d(LOGTAG, "Result OK");
                     Uri selectedImage = data.getData();
                     Bitmap bm = null;
                     try {
@@ -110,29 +106,26 @@ public class MeActivity extends AppCompatActivity implements View.OnClickListene
                     } catch (FileNotFoundException e) {
                         e.printStackTrace();
                     }
-                    if( bm != null)
-                    {
+                    if (bm != null) {
                         ByteArrayOutputStream stream = new ByteArrayOutputStream();
                         bm.compress(Bitmap.CompressFormat.PNG, 0, stream);
                         byte[] byteArray = stream.toByteArray();
-                        Log.d(LOGTAG,"Bitmap != NULL; Picture is set; Arraysize:" +byteArray.length);
+                        Log.d(LOGTAG, "Bitmap != NULL; Picture is set; Arraysize:" + byteArray.length);
                         RoosterConnection rc = RoosterConnectionService.getConnection();
-                        if ( rc != null) {
+                        if (rc != null) {
                             if (rc.setSelfAvatar(byteArray)) {
                                 Log.d(LOGTAG, "Profile picture set");
                                 //Set the avatar to be shown in the profile Image View
                                 Drawable image = new BitmapDrawable(getResources(),
                                         BitmapFactory.decodeByteArray(byteArray, 0, byteArray.length));
                                 profileImageView.setImageDrawable(image);
-                            } else
-                            {
-                                Log.d(LOGTAG,"Profile picture could not be set");
+                            } else {
+                                Log.d(LOGTAG, "Profile picture could not be set");
                             }
                         }
                     }
-                }else
-                {
-                    Log.d(LOGTAG,"Image selection canceled");
+                } else {
+                    Log.d(LOGTAG, "Image selection canceled");
                 }
         }
     }
