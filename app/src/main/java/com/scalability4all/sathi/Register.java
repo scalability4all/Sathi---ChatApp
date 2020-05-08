@@ -378,6 +378,16 @@ public class Register extends AppCompatActivity {
                 try {
                     Log.d(LOGTAG, "Parse error in getting user details");
                     Log.d(LOGTAG, error.getString("data"));
+                    AlertDialog.Builder builder = new AlertDialog.Builder(Register.this).setMessage(
+                            "Please try again later");
+                    builder.setTitle("Registration Failed");
+                    builder.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int i) {
+                            dialogInterface.dismiss();
+                        }
+                    });
+                    builder.show();
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
