@@ -3,6 +3,7 @@ package com.scalability4all.sathi;
 import android.annotation.TargetApi;
 import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
@@ -19,6 +20,7 @@ import android.widget.AutoCompleteTextView;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.android.material.button.MaterialButton;
@@ -239,7 +241,9 @@ public class LoginActivity extends AppCompatActivity {
                     prefs.edit()
                             .putString("hostname", data.getString("hostname"))
                             .commit();
+
                     saveCredentialsAndLogin();
+
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
@@ -250,6 +254,16 @@ public class LoginActivity extends AppCompatActivity {
                 try {
                     Log.d(LOGTAG, "Parse error in getting user details");
                     Log.d(LOGTAG, error.getString("data"));
+                    AlertDialog.Builder builder = new AlertDialog.Builder(LoginActivity.this).setMessage(
+                            "Please try again later");
+                    builder.setTitle("Login Failed");
+                    builder.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int i) {
+                            dialogInterface.dismiss();
+                        }
+                    });
+                    builder.show();
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
