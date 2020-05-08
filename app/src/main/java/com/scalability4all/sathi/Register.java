@@ -60,29 +60,30 @@ public class Register extends AppCompatActivity {
     TextView login;
     Timer timer;
     String emailPattern = "[a-zA-Z0-9._-]+@[a-z]+\\.+[a-z]+";
-    private CharSequence[] languages ;
+    private CharSequence[] languages;
     private String selectedLanguage;
     Map<CharSequence, String> languages_locale;
     View mProgressView;
     View mregisterFormView;
     TextView registration_error;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_register);
 
         mProgressView = findViewById(R.id.register_progress);
-        mregisterFormView=findViewById(R.id.register_form);
+        mregisterFormView = findViewById(R.id.register_form);
 
-        registration_error=(TextView)findViewById(R.id.error_message);
+        registration_error = findViewById(R.id.error_message);
 
-        languages_locale=Constants.languages_locale;
+        languages_locale = Constants.languages_locale;
 
-        languages= languages_locale.keySet().toArray(new CharSequence[0]);
+        languages = languages_locale.keySet().toArray(new CharSequence[0]);
 
-        username=findViewById(R.id.username);
-        password=findViewById(R.id.password);
-        confirm_password=findViewById(R.id.confirm_password);
+        username = findViewById(R.id.username);
+        password = findViewById(R.id.password);
+        confirm_password = findViewById(R.id.confirm_password);
         confirm_password.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
@@ -91,7 +92,7 @@ public class Register extends AppCompatActivity {
 
             @Override
             public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-                if(timer != null)
+                if (timer != null)
                     timer.cancel();
             }
 
@@ -110,31 +111,31 @@ public class Register extends AppCompatActivity {
         });
         confirm_password.setOnEditorActionListener(new EditText.OnEditorActionListener() {
 
-           @Override
-           public boolean onEditorAction(TextView textView, int actionId, KeyEvent keyEvent) {
-               if (actionId == EditorInfo.IME_ACTION_SEARCH ||
-                       actionId == EditorInfo.IME_ACTION_DONE ||
-                       keyEvent != null &&
-                               keyEvent.getAction() == KeyEvent.ACTION_DOWN &&
-                               keyEvent.getKeyCode() == KeyEvent.KEYCODE_ENTER) {
-                   if (keyEvent == null || !keyEvent.isShiftPressed()) {
-                       // the user is done typing.
-                       String pwd = password.getText().toString();
-                       String cpwd = confirm_password.getText().toString();
-                       if(!pwd.equals(cpwd)) {
-                           confirm_password.setError(getString(R.string.passwords_not_matching));
-                       }
-                       return true; // consume.
-                   }
-               }
-               return false;
-           }
+            @Override
+            public boolean onEditorAction(TextView textView, int actionId, KeyEvent keyEvent) {
+                if (actionId == EditorInfo.IME_ACTION_SEARCH ||
+                        actionId == EditorInfo.IME_ACTION_DONE ||
+                        keyEvent != null &&
+                                keyEvent.getAction() == KeyEvent.ACTION_DOWN &&
+                                keyEvent.getKeyCode() == KeyEvent.KEYCODE_ENTER) {
+                    if (keyEvent == null || !keyEvent.isShiftPressed()) {
+                        // the user is done typing.
+                        String pwd = password.getText().toString();
+                        String cpwd = confirm_password.getText().toString();
+                        if (!pwd.equals(cpwd)) {
+                            confirm_password.setError(getString(R.string.passwords_not_matching));
+                        }
+                        return true; // consume.
+                    }
+                }
+                return false;
+            }
         });
 
-        email=findViewById(R.id.email);
+        email = findViewById(R.id.email);
 
 
-        language=findViewById(R.id.language);
+        language = findViewById(R.id.language);
         language.setInputType(InputType.TYPE_NULL);
 
         language.setOnTouchListener(new View.OnTouchListener() {
@@ -146,18 +147,18 @@ public class Register extends AppCompatActivity {
                             .setTitle(R.string.choose_language)
                             .setPositiveButton(R.string.save, null)
                             .setNeutralButton(R.string.cancel, null)
-                            .setSingleChoiceItems(languages, Arrays.asList(languages).indexOf(selectedLanguage) , new DialogInterface.OnClickListener() {
+                            .setSingleChoiceItems(languages, Arrays.asList(languages).indexOf(selectedLanguage), new DialogInterface.OnClickListener() {
                                 @Override
                                 public void onClick(DialogInterface dialogInterface, int i) {
-                                    selectedLanguage=new String((String) languages[i]);
+                                    selectedLanguage = (String) languages[i];
                                 }
                             });
-                    final AlertDialog dialog=alertDialogBuilder.create();
+                    final AlertDialog dialog = alertDialogBuilder.create();
                     dialog.setOnShowListener(new DialogInterface.OnShowListener() {
                         @Override
                         public void onShow(DialogInterface dialogInterface) {
 
-                            Button button = ((AlertDialog) dialog).getButton(AlertDialog.BUTTON_POSITIVE);
+                            Button button = dialog.getButton(AlertDialog.BUTTON_POSITIVE);
                             button.setOnClickListener(new View.OnClickListener() {
 
                                 @Override
@@ -166,7 +167,7 @@ public class Register extends AppCompatActivity {
                                     dialog.dismiss();
                                 }
                             });
-                            Button close = ((AlertDialog) dialog).getButton(AlertDialog.BUTTON_NEGATIVE);
+                            Button close = dialog.getButton(AlertDialog.BUTTON_NEGATIVE);
                             close.setOnClickListener(new View.OnClickListener() {
 
                                 @Override
@@ -181,58 +182,58 @@ public class Register extends AppCompatActivity {
                 return false;
             }
         });
-        register=findViewById(R.id.register);
+        register = findViewById(R.id.register);
         register.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
 
-                String name=username.getText().toString();
+                String name = username.getText().toString();
                 String pwd = password.getText().toString();
                 String cpwd = confirm_password.getText().toString();
 
-                String mailId=email.getText().toString();
-                String lng=language.getText().toString();
+                String mailId = email.getText().toString();
+                String lng = language.getText().toString();
                 boolean doNotRegister = false;
-                if(TextUtils.isEmpty(name)) {
+                if (TextUtils.isEmpty(name)) {
                     username.setError(getString(R.string.error_field_required));
-                    doNotRegister=true;
+                    doNotRegister = true;
                 }
-                if(TextUtils.isEmpty(pwd)) {
+                if (TextUtils.isEmpty(pwd)) {
                     password.setError(getString(R.string.error_field_required));
-                    doNotRegister=true;
+                    doNotRegister = true;
                 }
                 if (!TextUtils.isEmpty(pwd) && !isPasswordValid(pwd)) {
                     password.setError(getString(R.string.error_invalid_password));
-                    doNotRegister=true;
+                    doNotRegister = true;
                 }
-                if(TextUtils.isEmpty(mailId)) {
+                if (TextUtils.isEmpty(mailId)) {
                     email.setError(getString(R.string.error_field_required));
-                    doNotRegister=true;
+                    doNotRegister = true;
                 }
-                if(!mailId.matches(emailPattern) && !TextUtils.isEmpty(mailId)) {
+                if (!mailId.matches(emailPattern) && !TextUtils.isEmpty(mailId)) {
                     email.setError(getString(R.string.error_incorrect_gmail));
-                    doNotRegister=true;
+                    doNotRegister = true;
                 }
-                if(TextUtils.isEmpty(lng)) {
+                if (TextUtils.isEmpty(lng)) {
                     language.setText(getString(R.string.error_field_required));
-                    doNotRegister=true;
+                    doNotRegister = true;
                 }
-                if(!pwd.equals(cpwd)) {
+                if (!pwd.equals(cpwd)) {
                     confirm_password.setError(getString(R.string.passwords_not_matching));
-                    doNotRegister=true;
+                    doNotRegister = true;
                 }
-                if(!doNotRegister) {
-                    getHostNameAndRegister(name,pwd,mailId,lng);
+                if (!doNotRegister) {
+                    getHostNameAndRegister(name, pwd, mailId, lng);
                     showProgress(true);
                 }
             }
         });
 
-        login=findViewById(R.id.link_to_signin);
+        login = findViewById(R.id.link_to_signin);
         login.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent i = new Intent(Register.this,LoginActivity.class);
+                Intent i = new Intent(Register.this, LoginActivity.class);
                 startActivity(i);
             }
         });
@@ -257,13 +258,13 @@ public class Register extends AppCompatActivity {
 
             //Register or UnRegister your broadcast receiver here
             unregisterReceiver(mBroadcastReceiver);
-        } catch(IllegalArgumentException e) {
+        } catch (IllegalArgumentException e) {
 
             e.printStackTrace();
         }
 
     }
-    
+
     @Override
     protected void onResume() {
         super.onResume();
@@ -271,18 +272,17 @@ public class Register extends AppCompatActivity {
             @Override
             public void onReceive(Context context, Intent intent) {
                 String action = intent.getAction();
-                switch (action)
-                {
+                switch (action) {
                     case Constants.BroadCastMessages.UI_AUTHENTICATED:
-                        Log.d(LOGTAG,"Mainscreen opens\n");
+                        Log.d(LOGTAG, "Mainscreen opens\n");
                         showProgress(false);
-                        Intent i = new Intent(getApplicationContext(),ChatListActivity.class);
+                        Intent i = new Intent(getApplicationContext(), ChatListActivity.class);
                         startActivity(i);
                         finish();
                         break;
                     case Constants.BroadCastMessages.UI_CONNECTION_ERROR:
-                        Log.d(LOGTAG,"Connection Error");
-                         showProgress(false);
+                        Log.d(LOGTAG, "Connection Error");
+                        showProgress(false);
                         // mJidView.setError("Login problems. Please check your details and try again.");
                         break;
                 }
@@ -298,61 +298,62 @@ public class Register extends AppCompatActivity {
         HashMap data = new HashMap();
         data.put("username", name);
         data.put("password", password);
-        data.put("language",languages_locale.get(language));
-        data.put("email",emailId);
+        data.put("language", languages_locale.get(language));
+        data.put("email", emailId);
         new VolleyService(new VolleyCallback() {
             @Override
             public void notifySuccess(JSONObject response) throws JSONException {
                 SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(Register.this);
                 prefs.edit()
-                        .putString("xmpp_jid",addHostNameToUserName(name,Register.this))
-                        .putString("xmpp_password",password)
-                        .putString("xmpp_email",emailId)
+                        .putString("xmpp_jid", addHostNameToUserName(name, Register.this))
+                        .putString("xmpp_password", password)
+                        .putString("xmpp_email", emailId)
                         .putString("language", language)
                         .putString("category", "")
                         .commit();
-        
+
                 Intent i1 = new Intent(Register.this, RoosterConnectionService.class);
                 startService(i1);
 
             }
+
             @Override
             public void notifyError(JSONObject error) {
                 try {
                     showProgress(false);
-                    JSONObject errorData=new JSONObject(error.getString("errors"));
+                    JSONObject errorData = new JSONObject(error.getString("errors"));
 
-                    if(errorData.getString("username")!=null && errorData.getString("username").length()>0) {
-                        JSONArray usernameErrors=new JSONArray(errorData.getString("username"));
-                        StringBuilder username_errors = new StringBuilder("");
-                        for (int i=0; i<usernameErrors.length(); i++) {
+                    if (errorData.getString("username") != null && errorData.getString("username").length() > 0) {
+                        JSONArray usernameErrors = new JSONArray(errorData.getString("username"));
+                        StringBuilder username_errors = new StringBuilder();
+                        for (int i = 0; i < usernameErrors.length(); i++) {
                             username_errors.append(usernameErrors.get(i));
-                            if((usernameErrors.length()-1)!=i) {
+                            if ((usernameErrors.length() - 1) != i) {
                                 username_errors.append(",");
                             }
                         }
-                        username.setError("Username " + String.valueOf(username_errors));
-                    } else if(errorData.getString("email")!=null && errorData.getString("email").length()>0) {
-                        JSONArray emailErrors=new JSONArray(errorData.getString("email"));
-                        StringBuilder email_errors = new StringBuilder("");
-                        for (int i=0; i<emailErrors.length(); i++) {
+                        username.setError("Username " + username_errors);
+                    } else if (errorData.getString("email") != null && errorData.getString("email").length() > 0) {
+                        JSONArray emailErrors = new JSONArray(errorData.getString("email"));
+                        StringBuilder email_errors = new StringBuilder();
+                        for (int i = 0; i < emailErrors.length(); i++) {
                             email_errors.append(emailErrors.get(i));
-                            if(emailErrors.length()-1!=i) {
+                            if (emailErrors.length() - 1 != i) {
                                 email_errors.append(",");
                             }
                         }
-                        email.setError("Email " + String.valueOf(email_errors));
-                    } else{
+                        email.setError("Email " + email_errors);
+                    } else {
                         registration_error.setText((CharSequence) errorData);
                     }
 
-                    Log.d(LOGTAG,"Unable to register");
-                    Log.d(LOGTAG,error.getString("data"));
+                    Log.d(LOGTAG, "Unable to register");
+                    Log.d(LOGTAG, error.getString("data"));
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
             }
-        }, Register.this).postDataVolley(REGISTER_USER,data);
+        }, Register.this).postDataVolley(REGISTER_USER, data);
     }
 
     private void getHostNameAndRegister(final String name, final String password, final String emailId, final String language) {
@@ -360,17 +361,18 @@ public class Register extends AppCompatActivity {
             @Override
             public void notifySuccess(JSONObject response) throws JSONException {
                 try {
-                    JSONObject data=new JSONObject(response.getString("data"));
+                    JSONObject data = new JSONObject(response.getString("data"));
                     SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(Register.this);
 
                     prefs.edit()
                             .putString("hostname", data.getString("hostname"))
                             .commit();
-                    register(name,password,emailId,language);
+                    register(name, password, emailId, language);
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
             }
+
             @Override
             public void notifyError(JSONObject error) {
                 try {
@@ -391,7 +393,7 @@ public class Register extends AppCompatActivity {
                 }
 
             }
-        },Register.this).getDataVolley(GET_HOST_NAME);
+        }, Register.this).getDataVolley(GET_HOST_NAME);
     }
 
 }

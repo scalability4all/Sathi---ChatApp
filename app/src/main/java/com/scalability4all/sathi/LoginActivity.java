@@ -61,6 +61,7 @@ public class LoginActivity extends AppCompatActivity {
     private BroadcastReceiver mBroadcastReceiver;
     private String serverurl = "localhost";
     private TextView register;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -86,21 +87,23 @@ public class LoginActivity extends AppCompatActivity {
         });
         mLoginFormView = findViewById(R.id.login_form);
         mProgressView = findViewById(R.id.login_progress);
-        register=findViewById(R.id.link_to_register);
+        register = findViewById(R.id.link_to_register);
         register.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent i = new Intent(LoginActivity.this,Register.class);
+                Intent i = new Intent(LoginActivity.this, Register.class);
                 startActivity(i);
             }
         });
 
     }
+
     @Override
     protected void onPause() {
         super.onPause();
         this.unregisterReceiver(mBroadcastReceiver);
     }
+
     @Override
     protected void onResume() {
         super.onResume();
@@ -108,19 +111,18 @@ public class LoginActivity extends AppCompatActivity {
             @Override
             public void onReceive(Context context, Intent intent) {
                 String action = intent.getAction();
-                switch (action)
-                {
+                switch (action) {
                     case Constants.BroadCastMessages.UI_AUTHENTICATED:
-                        Log.d(LOGTAG,"Mainscreen opens\n");
+                        Log.d(LOGTAG, "Mainscreen opens\n");
                         showProgress(false);
                         // getting user details
                         getUserPreferenceData(mJidView.getText().toString());
-                        Intent i = new Intent(getApplicationContext(),ChatListActivity.class);
+                        Intent i = new Intent(getApplicationContext(), ChatListActivity.class);
                         startActivity(i);
                         finish();
                         break;
                     case Constants.BroadCastMessages.UI_CONNECTION_ERROR:
-                        Log.d(LOGTAG,"Connection Error");
+                        Log.d(LOGTAG, "Connection Error");
                         showProgress(false);
                         mJidView.setError("Login problems. Please check your details and try again.");
                         break;
@@ -132,6 +134,7 @@ public class LoginActivity extends AppCompatActivity {
         filter.addAction(Constants.BroadCastMessages.UI_CONNECTION_ERROR);
         this.registerReceiver(mBroadcastReceiver, filter);
     }
+
     private void attemptLogin() {
         // Errors reset to default
         mJidView.setError(null);
@@ -151,7 +154,7 @@ public class LoginActivity extends AppCompatActivity {
             mJidView.setError(getString(R.string.error_field_required));
             focusView = mJidView;
             cancel = true;
-        } 
+        }
         if (cancel) {
             focusView.requestFocus();
         } else {
@@ -159,24 +162,27 @@ public class LoginActivity extends AppCompatActivity {
             getHostNameAndLogin();
         }
     }
+
     private boolean isJidValid(String email) {
         return email.contains("@");
     }
+
     private boolean isPasswordValid(String password) {
         return password.length() > 4;
     }
+
     // Show progress bar and hide login
     @TargetApi(Build.VERSION_CODES.HONEYCOMB_MR2)
     private void showProgress(final boolean show) {
         mProgressView.setVisibility(show ? View.VISIBLE : View.GONE);
         mLoginFormView.setVisibility(show ? View.GONE : View.VISIBLE);
     }
-    private void saveCredentialsAndLogin()
-    {
-        Log.d(LOGTAG,"saveCredentialsAndLogin() called.");
+
+    private void saveCredentialsAndLogin() {
+        Log.d(LOGTAG, "saveCredentialsAndLogin() called.");
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
         prefs.edit()
-                .putString("xmpp_jid", addHostNameToUserName(mJidView.getText().toString(),LoginActivity.this))
+                .putString("xmpp_jid", addHostNameToUserName(mJidView.getText().toString(), LoginActivity.this))
                 .putString("xmpp_password", mPasswordView.getText().toString())
                 .commit();
 
@@ -189,38 +195,39 @@ public class LoginActivity extends AppCompatActivity {
             @Override
             public void notifySuccess(JSONObject response) throws JSONException {
                 try {
-                    JSONObject data=new JSONObject(response.getString("data"));
+                    JSONObject data = new JSONObject(response.getString("data"));
                     SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(LoginActivity.this);
                     List<CharSequence> newsCategory = new ArrayList<CharSequence>();
-                    JSONArray category=new JSONArray(data.getString("category"));
-                    StringBuilder categories = new StringBuilder("");
+                    JSONArray category = new JSONArray(data.getString("category"));
+                    StringBuilder categories = new StringBuilder();
                     Map<CharSequence, String> languages_locale = Constants.languages_locale;
 
-                    for (int i=0; i<category.length(); i++) {
+                    for (int i = 0; i < category.length(); i++) {
                         categories.append(category.get(i));
-                        if((category.length()-1)!=i) {
+                        if ((category.length() - 1) != i) {
                             categories.append(",");
                         }
                     }
                     prefs.edit()
-                            .putString("language", (String) Constants.getKeyByValue(languages_locale,data.getString("language")))
+                            .putString("language", (String) Constants.getKeyByValue(languages_locale, data.getString("language")))
                             .putString("category", String.valueOf(categories))
                             .commit();
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
             }
+
             @Override
             public void notifyError(JSONObject error) {
                 try {
-                    Log.d(LOGTAG,"Parse error in getting user details");
-                    Log.d(LOGTAG,error.getString("data"));
+                    Log.d(LOGTAG, "Parse error in getting user details");
+                    Log.d(LOGTAG, error.getString("data"));
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
 
             }
-        },LoginActivity.this).getDataVolley(GET_USER_DETAILS+'/'+username.split("@")[0]);
+        }, LoginActivity.this).getDataVolley(GET_USER_DETAILS + '/' + username.split("@")[0]);
     }
 
     private void getHostNameAndLogin() {
@@ -228,7 +235,7 @@ public class LoginActivity extends AppCompatActivity {
             @Override
             public void notifySuccess(JSONObject response) throws JSONException {
                 try {
-                    JSONObject data=new JSONObject(response.getString("data"));
+                    JSONObject data = new JSONObject(response.getString("data"));
                     SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(LoginActivity.this);
 
                     prefs.edit()
@@ -241,6 +248,7 @@ public class LoginActivity extends AppCompatActivity {
                     e.printStackTrace();
                 }
             }
+
             @Override
             public void notifyError(JSONObject error) {
                 try {
@@ -261,15 +269,14 @@ public class LoginActivity extends AppCompatActivity {
                 }
 
             }
-        },LoginActivity.this).getDataVolley(GET_HOST_NAME);
+        }, LoginActivity.this).getDataVolley(GET_HOST_NAME);
     }
 
-    private void saveCredentialsAndLoginR(String username, String password)
-    {
-        Log.d(LOGTAG,"saveCredentialsAndLogin() called.");
+    private void saveCredentialsAndLoginR(String username, String password) {
+        Log.d(LOGTAG, "saveCredentialsAndLogin() called.");
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
         prefs.edit()
-                .putString("xmpp_jid", addHostNameToUserName(username,LoginActivity.this))
+                .putString("xmpp_jid", addHostNameToUserName(username, LoginActivity.this))
                 .putString("xmpp_password", password)
                 .commit();
         Intent i1 = new Intent(this, RoosterConnectionService.class);
@@ -277,7 +284,7 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     // Registrierung auf XMPP Server - Verbindung extra ohne Benutzerdaten
-    private void attemptRegister(final String username, final String password) throws IOException{
+    private void attemptRegister(final String username, final String password) throws IOException {
         XMPPTCPConnectionConfiguration conf = XMPPTCPConnectionConfiguration.builder()
                 .setXmppDomain(serverurl)
                 .setHost(getResources().getString(R.string.xmpp_host))
@@ -294,7 +301,7 @@ public class LoginActivity extends AppCompatActivity {
             @Override
             public void run() {
                 try {
-                    while(true) {
+                    while (true) {
                         try {
                             mConnection.connect();
                             AccountManager accountManager = AccountManager.getInstance(mConnection);
@@ -312,8 +319,6 @@ public class LoginActivity extends AppCompatActivity {
         };
         thread.start();
     }
-
-
 
 
 }
