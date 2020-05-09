@@ -18,8 +18,10 @@ import com.scalability4all.sathi.model.ContactModel;
 import com.scalability4all.sathi.xmpp.RoosterConnection;
 import com.scalability4all.sathi.xmpp.RoosterConnectionService;
 
+import static com.scalability4all.sathi.Constants.removeHostNameFromJID;
+
 public class ContactDetailsActivity extends AppCompatActivity {
-    private static final String LOGTAG = "ContactDetailsActivity" ;
+    private static final String LOGTAG = "ContactDetailsActivity";
     private String contactJid;
     private CheckBox fromCheckBox;
     private CheckBox toCheckBox;
@@ -29,18 +31,16 @@ public class ContactDetailsActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_contact_details);
-        mApplicationContext=getApplicationContext();
+        mApplicationContext = getApplicationContext();
         Intent intent = getIntent();
         contactJid = intent.getStringExtra("contact_jid");
-        setTitle(contactJid);
+        setTitle(removeHostNameFromJID(contactJid));
         ImageView profileImage = findViewById(R.id.contact_details_user_profile);
         RoosterConnection rc = RoosterConnectionService.getConnection();
         profileImage.setImageResource(R.mipmap.ic_profile);
-        if(rc != null)
-        {
+        if (rc != null) {
             String imageAbsPath = rc.getProfileImageAbsolutePath(contactJid);
-            if ( imageAbsPath != null)
-            {
+            if (imageAbsPath != null) {
                 Drawable d = Drawable.createFromPath(imageAbsPath);
                 profileImage.setImageDrawable(d);
             }
@@ -51,15 +51,12 @@ public class ContactDetailsActivity extends AppCompatActivity {
         fromCheckBox.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if( fromCheckBox.isChecked())
-                {
-                    Log.d(LOGTAG,"FROM Checkbox checked");
-                }else
-                {
-                    Log.d(LOGTAG,"FROM Checkbox unchecked");
-                    if(RoosterConnectionService.getConnection().unsubscribed(contactJid))
-                    {
-                        Toast.makeText(mApplicationContext,"Onlinestatus wird nicht mehr übertragen: "+ contactJid, Toast.LENGTH_LONG).show();
+                if (fromCheckBox.isChecked()) {
+                    Log.d(LOGTAG, "FROM Checkbox checked");
+                } else {
+                    Log.d(LOGTAG, "FROM Checkbox unchecked");
+                    if (RoosterConnectionService.getConnection().unsubscribed(contactJid)) {
+                        Toast.makeText(mApplicationContext, "Online status is no longer transmitted: " + contactJid, Toast.LENGTH_LONG).show();
                     }
                 }
 
@@ -69,86 +66,68 @@ public class ContactDetailsActivity extends AppCompatActivity {
         toCheckBox.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if( toCheckBox.isChecked())
-                {
-                    Log.d(LOGTAG,"Subscribtion checkbox checked");
-                    if(RoosterConnectionService.getConnection().subscribe(contactJid))
-                    {
-                        Toast.makeText(mApplicationContext,"Abo-Anfrage wurde gesendet:  "+ contactJid, Toast.LENGTH_LONG).show();
+                if (toCheckBox.isChecked()) {
+                    Log.d(LOGTAG, "Subscribtion checkbox checked");
+                    if (RoosterConnectionService.getConnection().subscribe(contactJid)) {
+                        Toast.makeText(mApplicationContext, "Subscription request has been sent:  " + contactJid, Toast.LENGTH_LONG).show();
                     }
-                }else
-                {
-                    Log.d(LOGTAG,"Subscribe checkbox unchecked");
-                    if(RoosterConnectionService.getConnection().unsubscribe(contactJid))
-                    {
-                        Toast.makeText(mApplicationContext,"Onlinestatus wird nicht mehr empfangen:  "+ contactJid, Toast.LENGTH_LONG).show();
+                } else {
+                    Log.d(LOGTAG, "Subscribe checkbox unchecked");
+                    if (RoosterConnectionService.getConnection().unsubscribe(contactJid)) {
+                        Toast.makeText(mApplicationContext, "Online status is no longer received:  " + contactJid, Toast.LENGTH_LONG).show();
                     }
                 }
             }
         });
         // Subscription query contact and corresponding layout changes
-        if(!ContactModel.get(getApplication()).isContactStranger(contactJid))
-        {
+        if (!ContactModel.get(getApplication()).isContactStranger(contactJid)) {
             Contact contact = ContactModel.get(getApplicationContext()).getContactByJidString(contactJid);
             Contact.SubscriptionType subType = contact.getSubscriptionType();
-            if(subType == Contact.SubscriptionType.NONE)
-            {
+            if (subType == Contact.SubscriptionType.NONE) {
                 fromCheckBox.setEnabled(false);
                 fromCheckBox.setChecked(false);
                 toCheckBox.setChecked(false);
-            }else if (subType == Contact.SubscriptionType.FROM)
-            {
+            } else if (subType == Contact.SubscriptionType.FROM) {
                 fromCheckBox.setEnabled(true);
                 fromCheckBox.setChecked(true);
                 toCheckBox.setChecked(false);
-            }else if (subType == Contact.SubscriptionType.TO)
-            {
+            } else if (subType == Contact.SubscriptionType.TO) {
                 fromCheckBox.setEnabled(false);
                 fromCheckBox.setChecked(false);
                 toCheckBox.setChecked(true);
-            }else if (subType == Contact.SubscriptionType.BOTH)
-            {
+            } else if (subType == Contact.SubscriptionType.BOTH) {
                 fromCheckBox.setEnabled(true);
                 fromCheckBox.setChecked(true);
                 toCheckBox.setChecked(true);
             }
-            if(contact.isPendingFrom())
-            {
+            if (contact.isPendingFrom()) {
                 pendingFrom.setVisibility(View.VISIBLE);
-            }else
-            {
+            } else {
                 pendingFrom.setVisibility(View.GONE);
             }
-            if(contact.isPendingTo())
-            {
+            if (contact.isPendingTo()) {
                 pendingTo.setVisibility(View.VISIBLE);
-            }else
-            {
+            } else {
                 pendingTo.setVisibility(View.GONE);
             }
-            if(subType == Contact.SubscriptionType.NONE)
-            {
+            if (subType == Contact.SubscriptionType.NONE) {
                 fromCheckBox.setEnabled(false);
                 fromCheckBox.setChecked(false);
                 toCheckBox.setChecked(false);
-            }else if (subType == Contact.SubscriptionType.FROM)
-            {
+            } else if (subType == Contact.SubscriptionType.FROM) {
                 fromCheckBox.setEnabled(true);
                 fromCheckBox.setChecked(true);
                 toCheckBox.setChecked(false);
-            }else if (subType == Contact.SubscriptionType.TO)
-            {
+            } else if (subType == Contact.SubscriptionType.TO) {
                 fromCheckBox.setEnabled(false);
                 fromCheckBox.setChecked(false);
                 toCheckBox.setChecked(true);
-            }else if (subType == Contact.SubscriptionType.BOTH)
-            {
+            } else if (subType == Contact.SubscriptionType.BOTH) {
                 fromCheckBox.setEnabled(true);
                 fromCheckBox.setChecked(true);
                 toCheckBox.setChecked(true);
             }
-        }else
-        {
+        } else {
             fromCheckBox.setEnabled(false);
             fromCheckBox.setChecked(false);
             toCheckBox.setChecked(false);

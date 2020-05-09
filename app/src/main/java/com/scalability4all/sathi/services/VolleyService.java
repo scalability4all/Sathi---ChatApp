@@ -3,6 +3,7 @@ package com.scalability4all.sathi.services;
 import android.content.Context;
 import android.icu.util.Freezable;
 import android.util.Log;
+
 import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
@@ -18,6 +19,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.UnsupportedEncodingException;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -25,19 +27,20 @@ public class VolleyService {
     VolleyCallback mResultCallback = null;
     Context mContext;
 
-    public static String BASE_SERVER_IP_ADDRESS="http://34.93.240.242:4567/";
-    public static String GET_USER_DETAILS=BASE_SERVER_IP_ADDRESS+"user/details";
-    public static String UPDATE_USER_PREFERENCE_LANGUAGE=BASE_SERVER_IP_ADDRESS+"update/user";
-    public static String UPDATE_USER_PREFERENCE_CATEGORY=BASE_SERVER_IP_ADDRESS+"update/category";
-    public static  String POST_TRANSLATION_TEXT=BASE_SERVER_IP_ADDRESS+"translate";
-    public static  String REGISTER_USER=BASE_SERVER_IP_ADDRESS+"user";
+    public static String BASE_SERVER_IP_ADDRESS = "http://34.93.240.242:4567/";
+    public static String GET_HOST_NAME = "http://34.93.240.242:4567/";
+    public static String GET_USER_DETAILS = BASE_SERVER_IP_ADDRESS + "user/details";
+    public static String UPDATE_USER_PREFERENCE_LANGUAGE = BASE_SERVER_IP_ADDRESS + "update/user";
+    public static String UPDATE_USER_PREFERENCE_CATEGORY = BASE_SERVER_IP_ADDRESS + "update/category";
+    public static String POST_TRANSLATION_TEXT = BASE_SERVER_IP_ADDRESS + "translate";
+    public static String REGISTER_USER = BASE_SERVER_IP_ADDRESS + "user";
 
-    public VolleyService(VolleyCallback resultCallback, Context  context){
+    public VolleyService(VolleyCallback resultCallback, Context context) {
         mResultCallback = resultCallback;
         mContext = context;
     }
 
-    public void postDataVolley( String url, final HashMap object){
+    public void postDataVolley(String url, final HashMap object) {
         try {
             RequestQueue requstQueue = Volley.newRequestQueue(mContext);
             StringRequest request = new StringRequest(Request.Method.POST, url, new Response.Listener<String>() {
@@ -45,7 +48,7 @@ public class VolleyService {
                 public void onResponse(String response) {
                     try {
                         JSONObject responseObject = new JSONObject(new JSONObject(response).getString("response"));
-                        if(responseObject.getString("status").equals("ok")) {
+                        if (responseObject.getString("status").equals("ok")) {
                             mResultCallback.notifySuccess(responseObject);
                         } else {
                             mResultCallback.notifyError(responseObject);
@@ -57,7 +60,7 @@ public class VolleyService {
             }, new Response.ErrorListener() {
                 @Override
                 public void onErrorResponse(VolleyError error) {
-                   Log.d("Volley error", String.valueOf(error));
+                    Log.d("Volley error", String.valueOf(error));
                 }
             }) {
                 @Override
@@ -68,28 +71,27 @@ public class VolleyService {
                 }
 
                 @Override
-                public byte[] getBody()  {
-                    try{
-                        return new JSONObject((Map) object).toString().getBytes("utf-8");
-                    }
-                    catch (Exception e){
-                        return new JSONObject((Map) object).toString().getBytes();
+                public byte[] getBody() {
+                    try {
+                        return new JSONObject(object).toString().getBytes(StandardCharsets.UTF_8);
+                    } catch (Exception e) {
+                        return new JSONObject(object).toString().getBytes();
                     }
 
                 }
+
                 @Override
                 public String getBodyContentType() {
                     return "application/json; charset:utf-8";
                 }
+
                 @Override
                 protected Response<String> parseNetworkResponse(NetworkResponse response) {
                     try {
                         // solution 1:
-                        String jsonString = new String(response.data, "UTF-8");
+                        String jsonString = new String(response.data, StandardCharsets.UTF_8);
                         return Response.success(jsonString,
                                 HttpHeaderParser.parseCacheHeaders(response));
-                    } catch (UnsupportedEncodingException e) {
-                        return Response.error(new ParseError(e));
                     } catch (Exception je) {
                         return Response.error(new ParseError(je));
                     }
@@ -100,12 +102,12 @@ public class VolleyService {
                     DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
                     DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
             requstQueue.add(request);
-        }catch(Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
-    public void getDataVolley(String url){
+    public void getDataVolley(String url) {
         try {
             StringRequest request = new StringRequest(Request.Method.GET, url,
                     new Response.Listener<String>() {
@@ -113,7 +115,7 @@ public class VolleyService {
                         public void onResponse(String response) {
                             try {
                                 JSONObject responseObject = new JSONObject(new JSONObject(response).getString("response"));
-                                if(responseObject.getString("status").equals("ok")) {
+                                if (responseObject.getString("status").equals("ok")) {
                                     mResultCallback.notifySuccess(responseObject);
                                 } else {
                                     mResultCallback.notifyError(responseObject);
@@ -132,7 +134,7 @@ public class VolleyService {
             RequestQueue requestQueue = Volley.newRequestQueue(mContext);
             requestQueue.add(request);
 
-        }catch(Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }

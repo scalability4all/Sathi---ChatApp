@@ -9,6 +9,7 @@ public class ContactCursorWrapper extends CursorWrapper {
     public ContactCursorWrapper(Cursor cursor) {
         super(cursor);
     }
+
     public Contact getContact() {
         String subscriptionTypeString = getString(getColumnIndex(Contact.Cols.SUBSCRIPTION_TYPE));
         String jid = getString(getColumnIndex(Contact.Cols.CONTACT_JID));
@@ -30,9 +31,9 @@ public class ContactCursorWrapper extends CursorWrapper {
         Contact contact = new Contact(jid, subscriptionType);
         contact.setPersistID(contactUniqueId);
         contact.setProfileImagePath(profileImagePath);
-        contact.setPendingFrom((pendingFromInt == 0) ? false:true);
-        contact.setPendingTo((pendingToInt == 0)? false:true);
-        contact.setOnlineStatus((onlineStatusInt == 0) ? false:true);
+        contact.setPendingFrom(pendingFromInt != 0);
+        contact.setPendingTo(pendingToInt != 0);
+        contact.setOnlineStatus(onlineStatusInt != 0);
         return contact;
     }
 }
