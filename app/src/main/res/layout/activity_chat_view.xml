@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/default_background"
+    android:background="@color/chat_background"
     tools:context="com.scalability4all.sathi.ChatViewActivity">
 
     <androidx.recyclerview.widget.RecyclerView
@@ -23,11 +23,11 @@
         android:id="@+id/textsend"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:background="@color/colorPrimaryDoubleDark"
         android:layout_alignParentLeft="true"
-        android:layout_marginBottom="5dp"
-        android:clickable="true">
+        android:layout_alignParentBottom="true"
+        android:background="@color/colorPrimaryDark"
+        android:clickable="true"
+        android:padding="5dp">
 
         <EditText
             android:id="@+id/textinput"
@@ -49,6 +49,7 @@
             android:textColor="@color/colorPrimaryDark">
 
         </EditText>
+
         <ImageButton
             android:id="@+id/textSendButton"
             android:layout_width="30dp"
@@ -56,12 +57,12 @@
             android:layout_alignParentRight="true"
             android:layout_centerVertical="true"
             android:layout_marginRight="10dp"
-            android:src="@drawable/ic_send_white"
-            android:clickable="true"
-            android:focusable="true"
             android:background="@null"
-            android:contentDescription="@string/send_message" />
-            </RelativeLayout>
+            android:clickable="true"
+            android:contentDescription="@string/send_message"
+            android:focusable="true"
+            android:src="@drawable/ic_send_white" />
+    </RelativeLayout>
         <!--    <RelativeLayout-->
 <!--        android:layout_width="match_parent"-->
 <!--        android:layout_height="wrap_content"-->

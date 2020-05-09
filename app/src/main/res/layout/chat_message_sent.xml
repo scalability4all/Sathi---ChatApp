@@ -27,7 +27,7 @@
             android:id="@+id/bubble"
             app:cardCornerRadius="8dp"
             app:cardElevation="4dp"
-            app:cardBackgroundColor="@color/default_bubble_color_send"
+            app:cardBackgroundColor="@color/white"
             app:cardUseCompatPadding="true"
             android:layout_gravity="end"
             android:layout_width="wrap_content"
@@ -48,7 +48,7 @@
                     android:layout_gravity="left"
                     android:gravity="center_vertical|start"
                     android:linksClickable="true"
-                    android:textColor="@color/default_message_color_send"
+                    android:textColor="@color/colorPrimaryDark"
                     android:textSize="@dimen/default_message_text_size"
                     tools:text="Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. " />
 
@@ -61,7 +61,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:gravity="center_vertical|start"
-                    android:textColor="@color/default_tstamp_color_send"
+                    android:textColor="@color/colorPrimaryDark"
                     android:textSize="@dimen/default_timestamp_text_size"
                     tools:text="12:10 am" />
 
