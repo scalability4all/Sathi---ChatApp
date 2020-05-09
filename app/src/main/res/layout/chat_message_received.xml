@@ -10,12 +10,11 @@
         android:id="@+id/profile"
         android:layout_width="62dp"
         android:layout_height="62dp"
-        app:riv_corner_radius="52dp"
-        app:riv_border_color="@color/riv_border_color"
-        app:riv_border_width="1dip"
         android:layout_alignParentRight="true"
         android:src="@mipmap/ic_profile"
-        android:layout_centerVertical="true"/>
+        app:riv_border_color="@color/riv_border_color"
+        app:riv_border_width="1dip"
+        app:riv_corner_radius="52dp" />
 
     <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:app="http://schemas.android.com/apk/res-auto"
@@ -31,7 +30,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="start"
-            app:cardBackgroundColor="@color/default_bubble_color_rcv"
+            app:cardBackgroundColor="@color/green"
             app:cardCornerRadius="8dp"
             app:cardUseCompatPadding="true">
 
@@ -49,7 +48,7 @@
                     android:gravity="center_vertical|start"
                     android:linksClickable="true"
                     android:autoLink="all"
-                    android:textColor="@color/default_message_color_rcv"
+                    android:textColor="@color/colorPrimaryDark"
                     android:textSize="@dimen/default_message_text_size"
                     tools:text="Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat."
                     android:layout_gravity="left"/>
@@ -64,7 +63,7 @@
                     android:layout_height="wrap_content"
                     android:layout_gravity="end"
                     android:gravity="center_vertical|end"
-                    android:textColor="@color/default_tstamp_color_rcv"
+                    android:textColor="@color/colorPrimaryDark"
                     android:textSize="@dimen/default_timestamp_text_size"
                     tools:text="12:10 am" />
 

@@ -13,8 +13,13 @@
     <color name="default_bubble_color_send">#c78eff</color>
 
     <color name="white">#FFFFFF</color>
+    <color name="default_background">#F1F1F1</color>
+    <color name="chat_background">#ECE5DD</color>
 
-    <color name="riv_border_color">#552a78</color>
+    <color name="green">#DCF8C6</color>
+
+
+    <color name="riv_border_color">#75D2B0F1</color>
     <color name="chat_light_background">#cbcbcb</color>
 <!--    <color name="colorPrimary">#A0024C</color>-->
 <!--    <color name="colorPrimaryDark">#750238</color>-->
