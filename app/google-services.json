@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "firebase_number",
+    "firebase_url": "firebase_url",
+    "project_id": "sathi-app",
+    "storage_bucket": "sathi-app.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "firebase_app_id",
+        "android_client_info": {
+          "package_name": "com.scalability4all.sathi"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "firebase_oauth_client_id",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "firebase_current_key"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "firebase_other_client_id",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
