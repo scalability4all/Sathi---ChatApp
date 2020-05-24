@@ -18,6 +18,16 @@
         android:textAlignment="center"
         android:visibility="gone" />
 
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:layout_margin="40dp"
+        android:text="@string/sign_up"
+        android:textAllCaps="true"
+        android:textAppearance="@style/TextAppearance.AppCompat.Display1"
+        android:textStyle="bold" />
+
     <ScrollView
         android:id="@+id/register_form"
         android:layout_width="match_parent"
@@ -32,18 +42,17 @@
             <com.google.android.material.textfield.TextInputLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="10dp"
-                >
+                android:layout_marginTop="10dp">
 
                 <EditText
                     android:id="@+id/username"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:inputType="text"
-                    android:textSize="12sp"
-                    android:maxLines="1"
+                    android:hint="Username"
                     android:imeOptions="actionUnspecified"
-                    android:hint="Username" />
+                    android:inputType="text"
+                    android:maxLines="1"
+                    android:textSize="12sp" />
 
             </com.google.android.material.textfield.TextInputLayout>
 
@@ -56,11 +65,11 @@
                     android:id="@+id/password"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:inputType="textPassword"
-                    android:textSize="12sp"
-                    android:maxLines="1"
+                    android:hint="Password"
                     android:imeOptions="actionUnspecified"
-                    android:hint="Password" />
+                    android:inputType="textPassword"
+                    android:maxLines="1"
+                    android:textSize="12sp" />
 
             </com.google.android.material.textfield.TextInputLayout>
 
@@ -68,47 +77,48 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="10dp">
+
                 <EditText
                     android:id="@+id/confirm_password"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:inputType="textPassword"
-                    android:textSize="12sp"
-                    android:maxLines="1"
-                    android:imeOptions="actionUnspecified"
                     android:hint="Confirm Password"
-                    />
+                    android:imeOptions="actionUnspecified"
+                    android:inputType="textPassword"
+                    android:maxLines="1"
+                    android:textSize="12sp" />
             </com.google.android.material.textfield.TextInputLayout>
 
             <com.google.android.material.textfield.TextInputLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="10dp">
+
                 <EditText
                     android:id="@+id/email"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:inputType="textEmailAddress"
-                    android:textSize="12sp"
+                    android:hint="Email Id"
                     android:imeOptions="actionUnspecified"
+                    android:inputType="textEmailAddress"
                     android:maxLines="1"
-                    android:hint="Email Id"/>
+                    android:textSize="12sp" />
             </com.google.android.material.textfield.TextInputLayout>
 
             <com.google.android.material.textfield.TextInputLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="10dp">
+
                 <EditText
                     android:id="@+id/language"
                     style="?android:attr/spinnerStyle"
                     android:layout_width="match_parent"
-                    android:textSize="12sp"
-                    android:imeOptions="actionUnspecified"
                     android:layout_height="47dp"
                     android:hint="Select Language"
+                    android:imeOptions="actionUnspecified"
                     android:maxLines="1"
-                    />
+                    android:textSize="12sp" />
             </com.google.android.material.textfield.TextInputLayout>
 
             <Button
@@ -116,11 +126,11 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
-                android:textSize="12sp"
                 android:layout_marginTop="10dp"
                 android:layout_marginBottom="10dp"
                 android:background="#0b84aa"
-                android:text="Register" />
+                android:text="Register"
+                android:textSize="12sp" />
 
 
             <TextView
@@ -128,18 +138,17 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="10dip"
-                android:textAlignment="center"
-                 />
+                android:textAlignment="center" />
 
 
-            <TextView android:id="@+id/link_to_signin"
+            <TextView
+                android:id="@+id/link_to_signin"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="40dip"
                 android:layout_marginBottom="40dip"
-                android:text="Already have an account ? Sign up"
                 android:gravity="center"
-                android:textColor="#0b84aa"/>
+                android:text="Already have an account ? Sign in"
+                android:textColor="#0b84aa" />
 
 
         </LinearLayout>

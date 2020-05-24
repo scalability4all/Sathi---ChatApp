@@ -9,24 +9,14 @@
     android:layout_marginLeft="10dp"
     android:layout_marginRight="10dp"
     tools:context=".Settings">
-    <TextView
-        android:id="@+id/preferences"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="@string/preference"
-        android:layout_marginTop="10dp"
-        android:textSize="18sp" />
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:layout_marginTop="5dp"
-        android:background="@android:color/darker_gray" />
+
     <TextView
         android:id="@+id/text"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="10dp"
-        android:text="@string/language" />
+        android:text="@string/language"
+        android:textAppearance="@style/TextAppearance.AppCompat.Large" />
     <EditText
         android:id="@+id/language"
         style="?android:attr/spinnerStyle"
@@ -34,16 +24,27 @@
         android:layout_height="47dp"
         android:layout_marginTop="2dp"
         />
+
     <TextView
         android:id="@+id/textNewsCategory"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="10dp"
-        android:text="@string/category" />
-    <EditText
-        android:id="@+id/news_category"
-        style="?android:attr/spinnerStyle"
+        android:layout_marginBottom="10dp"
+        android:text="@string/category"
+        android:textAppearance="@style/TextAppearance.AppCompat.Large" />
+
+    <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="47dp"
-        />
+        android:layout_height="match_parent">
+
+        <TableLayout
+            android:id="@+id/news_category"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:stretchColumns="*">
+
+            </TableLayout>
+    </ScrollView>
+
 </LinearLayout>

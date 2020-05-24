@@ -9,7 +9,11 @@ import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.EditText;
+import android.widget.LinearLayout;
+import android.widget.TableLayout;
+import android.widget.TableRow;
 
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
@@ -26,19 +30,17 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 
 import static com.scalability4all.sathi.services.VolleyService.UPDATE_USER_PREFERENCE_CATEGORY;
 import static com.scalability4all.sathi.services.VolleyService.UPDATE_USER_PREFERENCE_LANGUAGE;
 
 public class Settings extends AppCompatActivity {
     private static final String LOGTAG = "Settings";
-    private String languageSelected;
-    private String[] newsCategoriesSelected;
     private CharSequence[] languages;
-    private CharSequence[] newsCategories = {"Business", "Politics", "Entertainment", "LifeStyle", "India", "Sports", "World"};
+    private CharSequence[] newsCategories = { "Business", "Politics", "Entertainment", "LifeStyle", "India", "Sports",
+            "World" };
     private EditText language;
-    private EditText newsCategory;
+    private TableLayout newsCategory;
     private String selectedLanguage;
     private List<CharSequence> selectedNewsCategories;
     List<CharSequence> cs = new ArrayList<CharSequence>();
@@ -50,6 +52,7 @@ public class Settings extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setTitle(R.string.settings);
         setContentView(R.layout.activity_settings);
+        newsCategory = (TableLayout) findViewById(R.id.news_category);
 
         SharedPreferences sh = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
         username = sh.getString("xmpp_jid", null);
@@ -64,11 +67,13 @@ public class Settings extends AppCompatActivity {
         selectedLanguage = sh.getString("language", null);
         String newsCategorySavedInDb = sh.getString("category", null);
         if (newsCategorySavedInDb != null && newsCategorySavedInDb.length() > 0) {
-            selectedNewsCategories = new ArrayList<CharSequence>(Arrays.asList(PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).getString("category", null).split(",")));
+            selectedNewsCategories = new ArrayList<CharSequence>(Arrays.asList(PreferenceManager
+                    .getDefaultSharedPreferences(getApplicationContext()).getString("category", null).split(",")));
         } else {
             selectedNewsCategories = new ArrayList<CharSequence>();
         }
 
+        addNewsCategories(newsCategory);
 
         language = findViewById(R.id.language);
         language.setInputType(InputType.TYPE_NULL);
@@ -77,18 +82,18 @@ public class Settings extends AppCompatActivity {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
                 if (event.getAction() == MotionEvent.ACTION_DOWN) {
-                    //dialogue popup
+                    // dialogue popup
                     final AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(Settings.this)
-                            .setTitle(R.string.choose_language)
-                            .setPositiveButton(R.string.save, null)
-                            .setNeutralButton(R.string.cancel, null)
-                            .setSingleChoiceItems(languages, Arrays.asList(languages).indexOf(selectedLanguage), new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialogInterface, int i) {
-                                    selectedLanguage = (String) languages[i];
-                                    Log.d(LOGTAG, "Selected Language->" + selectedLanguage);
-                                }
-                            });
+                            .setTitle(R.string.choose_language).setPositiveButton(R.string.save, null)
+                            .setNeutralButton(R.string.cancel, null).setSingleChoiceItems(languages,
+                                    Arrays.asList(languages).indexOf(selectedLanguage),
+                                    new DialogInterface.OnClickListener() {
+                                        @Override
+                                        public void onClick(DialogInterface dialogInterface, int i) {
+                                            selectedLanguage = (String) languages[i];
+                                            Log.d(LOGTAG, "Selected Language->" + selectedLanguage);
+                                        }
+                                    });
                     final AlertDialog dialog = alertDialogBuilder.create();
                     dialog.setOnShowListener(new DialogInterface.OnShowListener() {
                         @Override
@@ -108,10 +113,9 @@ public class Settings extends AppCompatActivity {
                                         public void notifySuccess(JSONObject response) throws JSONException {
                                             try {
                                                 JSONObject data = new JSONObject(response.getString("data"));
-                                                SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(Settings.this);
-                                                prefs.edit()
-                                                        .putString("language", selectedLanguage)
-                                                        .commit();
+                                                SharedPreferences prefs = PreferenceManager
+                                                        .getDefaultSharedPreferences(Settings.this);
+                                                prefs.edit().putString("language", selectedLanguage).commit();
                                             } catch (JSONException e) {
                                                 e.printStackTrace();
                                             }
@@ -138,89 +142,91 @@ public class Settings extends AppCompatActivity {
                 return false;
             }
         });
-
-        newsCategory = findViewById(R.id.news_category);
-        newsCategory.setInputType(InputType.TYPE_NULL);
-        newsCategory.setText(selectedNewsCategories.toString().replaceAll("(^\\[|\\]$)", "").replace(", ", ","));
-        newsCategory.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                if (event.getAction() == MotionEvent.ACTION_DOWN) {
-                    //dialogue popup
-                    boolean[] newsChioces = new boolean[newsCategories.length];
-                    for (int i = 0; i < newsCategories.length; i++)
-                        newsChioces[i] = selectedNewsCategories.indexOf(newsCategories[i]) != -1;
-                    final AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(Settings.this)
-                            .setTitle(R.string.category_choose_stmt)
-                            .setPositiveButton(R.string.save, null)
-                            .setNeutralButton(R.string.cancel, null)
-                            .setMultiChoiceItems(newsCategories, newsChioces, new DialogInterface.OnMultiChoiceClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialog, int which, boolean isChecked) {
-                                    if (isChecked) {
-                                        selectedNewsCategories.add(newsCategories[which]);
-                                    } else {
-                                        selectedNewsCategories.remove(newsCategories[which]);
-                                    }
-                                }
-                            });
-                    final AlertDialog dialog = alertDialogBuilder.create();
-                    dialog.setOnShowListener(new DialogInterface.OnShowListener() {
-
-                        @Override
-                        public void onShow(DialogInterface dialogInterface) {
-
-                            Button button = dialog.getButton(AlertDialog.BUTTON_POSITIVE);
-                            button.setOnClickListener(new View.OnClickListener() {
-
-                                @Override
-                                public void onClick(View view) {
-                                    newsCategory.setText(selectedNewsCategories.toString().replaceAll("(^\\[|\\]$)", "").replace(", ", ","));
-                                    Log.d(LOGTAG, "Selected Categories->" + selectedNewsCategories.toString().replaceAll("(^\\[|\\]$)", "").replace(", ", ","));
-                                    HashMap data = new HashMap();
-                                    data.put("username", username);
-                                    data.put("category", selectedNewsCategories.toString().replaceAll("(^\\[|\\]$)", "").replace(", ", ","));
-                                    VolleyService mVolleyService = new VolleyService(new VolleyCallback() {
-                                        @Override
-                                        public void notifySuccess(JSONObject response) throws JSONException {
-                                            try {
-                                                JSONArray data = new JSONArray(response.getString("data"));
-                                                List<CharSequence> list = new ArrayList<CharSequence>();
-                                                for (int i = 0; i < data.length(); i++) {
-                                                    list.add((CharSequence) data.get(i));
-                                                }
-                                                SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(Settings.this);
-                                                prefs.edit()
-                                                        .putString("category", list.toString().replaceAll("(^\\[|\\]$)", "").replace(", ", ","))
-                                                        .commit();
-                                            } catch (JSONException e) {
-                                                e.printStackTrace();
-                                            }
-                                            dialog.dismiss();
-                                        }
-
-                                        @Override
-                                        public void notifyError(JSONObject error) {
-                                            try {
-                                                Log.d(LOGTAG, "Category updation failed");
-                                                Log.d(LOGTAG, error.getString("data"));
-                                            } catch (JSONException e) {
-                                                e.printStackTrace();
-                                            }
-                                        }
-                                    }, Settings.this);
-                                    mVolleyService.postDataVolley(UPDATE_USER_PREFERENCE_CATEGORY, data);
-                                }
-                            });
-                        }
-                    });
-                    dialog.show();
-                }
-                return false;
-            }
-        });
-
     }
 
+    private void addNewsCategories(LinearLayout linearLayout) {
+
+        TableRow row = new TableRow(getApplicationContext());
+        TableRow.LayoutParams lp = new TableRow.LayoutParams(TableRow.LayoutParams.WRAP_CONTENT);
+        row.setLayoutParams(lp);
+
+        for (int i = 0; i < newsCategories.length; i++) {
+
+            if (i != 0 && i % 2 == 0) {
+                row = new TableRow(getApplicationContext());
+                row.setLayoutParams(lp);
+            }
+
+            CheckBox checkBox = new CheckBox(getApplicationContext());
+            checkBox.setTag(newsCategories[i]);
+            checkBox.setText(newsCategories[i]);
+
+            if (selectedNewsCategories.indexOf(newsCategories[i]) != -1) {
+                checkBox.setChecked(true);
+            } else {
+                checkBox.setChecked(false);
+            }
+
+            checkBox.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    // Is the view now checked?
+                    boolean checked = ((CheckBox) view).isChecked();
+                    if (checked)
+                        selectedNewsCategories.add(((CheckBox) view).getText());
+                    else
+                        selectedNewsCategories.remove(((CheckBox) view).getText());
+
+                    saveNewsCategories();
+
+                }
+            });
+
+            row.addView(checkBox);
+            
+            // to make sure each row has two checkboxes, and a new row is created after the row is filled.
+            if (i % 2 == 0) {
+                linearLayout.addView(row);
+            }else if(i+1<newsCategories.length){
+                row = new TableRow(getApplicationContext());
+                row.setLayoutParams(lp);
+            }
+        }
+    }
+
+    private void saveNewsCategories() {
+        HashMap data = new HashMap();
+        data.put("username", username);
+        data.put("category", selectedNewsCategories.toString().replaceAll("(^\\[|\\]$)", "").replace(", ", ","));
+        VolleyService mVolleyService = new VolleyService(new VolleyCallback() {
+            @Override
+            public void notifySuccess(JSONObject response) throws JSONException {
+                try {
+                    JSONArray data = new JSONArray(response.getString("data"));
+                    List<CharSequence> list = new ArrayList<CharSequence>();
+                    for (int i = 0; i < data.length(); i++) {
+                        list.add((CharSequence) data.get(i));
+                    }
+                    SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(Settings.this);
+                    prefs.edit().putString("category", list.toString().replaceAll("(^\\[|\\]$)", "").replace(", ", ","))
+                            .commit();
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+
+            }
+
+            @Override
+            public void notifyError(JSONObject error) {
+                try {
+                    Log.d(LOGTAG, "Category updation failed");
+                    Log.d(LOGTAG, error.getString("data"));
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+        }, Settings.this);
+        mVolleyService.postDataVolley(UPDATE_USER_PREFERENCE_CATEGORY, data);
+    }
 
 }
