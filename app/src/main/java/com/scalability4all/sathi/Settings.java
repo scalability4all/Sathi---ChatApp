@@ -183,8 +183,13 @@ public class Settings extends AppCompatActivity {
             });
 
             row.addView(checkBox);
+            
+            // to make sure each row has two checkboxes, and a new row is created after the row is filled.
             if (i % 2 == 0) {
                 linearLayout.addView(row);
+            }else if(i+1<newsCategories.length){
+                row = new TableRow(getApplicationContext());
+                row.setLayoutParams(lp);
             }
         }
     }
