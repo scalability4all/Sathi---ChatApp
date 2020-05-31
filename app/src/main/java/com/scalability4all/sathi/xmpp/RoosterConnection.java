@@ -8,7 +8,6 @@ import android.graphics.BitmapFactory;
 import android.preference.PreferenceManager;
 import android.util.Log;
 
-
 import com.scalability4all.sathi.Constants;
 import com.scalability4all.sathi.R;
 import com.scalability4all.sathi.Utilities;
@@ -22,6 +21,7 @@ import com.scalability4all.sathi.services.VolleyService;
 
 import org.jivesoftware.smack.ConnectionConfiguration;
 import org.jivesoftware.smack.ConnectionListener;
+import org.jivesoftware.smack.ReconnectionManager;
 import org.jivesoftware.smack.SmackConfiguration;
 import org.jivesoftware.smack.SmackException;
 import org.jivesoftware.smack.XMPPConnection;
@@ -62,7 +62,6 @@ import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.SSLSession;
 
 import static com.scalability4all.sathi.model.Chat.ContactType.STRANGER;
-import static com.scalability4all.sathi.services.VolleyService.UPDATE_USER_PREFERENCE_CATEGORY;
 import static com.scalability4all.sathi.services.VolleyService.POST_TRANSLATION_TEXT;
 
 public class RoosterConnection implements ConnectionListener, SubscribeListener, RosterListener {
@@ -233,6 +232,7 @@ public class RoosterConnection implements ConnectionListener, SubscribeListener,
         mRoster.setSubscriptionMode(Roster.SubscriptionMode.manual);
         mRoster.addSubscribeListener(this);
         mRoster.addRosterListener(this);
+        setServerSettings();
         vCardManager = VCardManager.getInstanceFor(mConnection);
         chatManager = ChatManager.getInstanceFor(mConnection);
         chatManager.addIncomingListener(new IncomingChatMessageListener() {
@@ -266,6 +266,17 @@ public class RoosterConnection implements ConnectionListener, SubscribeListener,
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
+    }
+
+    /**
+     * Configure XMPP connection to use provided ping timeout and reply timeout.
+     */
+    private void setServerSettings() {
+        // Enable auto-connect
+        ReconnectionManager.getInstanceFor(mConnection).enableAutomaticReconnection();
+        // Set reconnection policy to increasing delay
+        ReconnectionManager.getInstanceFor(mConnection)
+                .setReconnectionPolicy(ReconnectionManager.ReconnectionPolicy.RANDOM_INCREASING_DELAY);
     }
 
     public boolean setSelfAvatar(byte[] image) {
