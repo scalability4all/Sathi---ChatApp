@@ -9,7 +9,6 @@ import java.util.Map;
 import java.util.Objects;
 
 public class Constants {
-    public static Map<CharSequence, String> languages_locale;
 
 
     public static final class BroadCastMessages {
@@ -25,15 +24,7 @@ public class Constants {
     public static final String UI_NEW_MESSAGE = "com.scalability4all.sathi.ui_new_message";
     public static final String ONLINE_STATUS_CHANGE_CONTACT = "com.scalability4all.sathi.online_status_change_contact";
 
-    static {
-        // languages
-        languages_locale = new HashMap<>();
-        languages_locale.put("english", "en-IN");
-        languages_locale.put("hindi", "hi-IN");
-        languages_locale.put("punjabi", "pa-guru-IN");
-        languages_locale.put("tamil", "ta-IN");
-        languages_locale.put("telugu", "te-IN");
-    }
+
 
     public static <T, E> T getKeyByValue(Map<T, E> map, E value) {
         for (Map.Entry<T, E> entry : map.entrySet()) {
