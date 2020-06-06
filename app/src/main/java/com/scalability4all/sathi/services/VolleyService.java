@@ -1,8 +1,14 @@
 package com.scalability4all.sathi.services;
 
 import android.content.Context;
+import android.content.DialogInterface;
 import android.icu.util.Freezable;
 import android.util.Log;
+import android.view.MotionEvent;
+import android.view.View;
+import android.widget.Button;
+
+import androidx.appcompat.app.AlertDialog;
 
 import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.Request;
@@ -14,13 +20,19 @@ import com.android.volley.ParseError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.android.volley.NetworkResponse;
+import com.scalability4all.sathi.R;
+import com.scalability4all.sathi.Register;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class VolleyService {
@@ -28,12 +40,14 @@ public class VolleyService {
     Context mContext;
 
     public static String BASE_SERVER_IP_ADDRESS = "http://34.93.240.242:4567/";
-    public static String GET_HOST_NAME = "http://34.93.240.242:4567/";
+    public static String GET_HOST_NAME = BASE_SERVER_IP_ADDRESS;
     public static String GET_USER_DETAILS = BASE_SERVER_IP_ADDRESS + "user/details";
     public static String UPDATE_USER_PREFERENCE_LANGUAGE = BASE_SERVER_IP_ADDRESS + "update/user";
     public static String UPDATE_USER_PREFERENCE_CATEGORY = BASE_SERVER_IP_ADDRESS + "update/category";
     public static String POST_TRANSLATION_TEXT = BASE_SERVER_IP_ADDRESS + "translate";
     public static String REGISTER_USER = BASE_SERVER_IP_ADDRESS + "user";
+    public static String GET_LANGUAGES_LIST = BASE_SERVER_IP_ADDRESS + "languages";
+    public static String GET_CATEGORIES_LIST = BASE_SERVER_IP_ADDRESS + "news_categories";
 
     public VolleyService(VolleyCallback resultCallback, Context context) {
         mResultCallback = resultCallback;
@@ -137,5 +151,28 @@ public class VolleyService {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+
+
+    public static void getListOfLanguages(LanguagesListCallback cb,Context context){
+        new VolleyService(new VolleyCallback() {
+            @Override
+            public void notifySuccess(JSONObject response) throws JSONException {
+                JSONArray data = new JSONArray(response.getString("data"));
+                List<CharSequence> list = new ArrayList<CharSequence>();
+                Map<CharSequence, String> languages_locale= new HashMap<>();
+                for (int i = 0; i < data.length(); i++) {
+                    JSONObject dat= (JSONObject) data.get(i);
+                    languages_locale.put(dat.getString("name"), dat.getString("code"));
+                }
+                cb.notifySuccess(languages_locale);
+            }
+            @Override
+            public void notifyError(JSONObject error) {
+                cb.notifyError(error);
+            }
+        }, context).getDataVolley(GET_LANGUAGES_LIST);
+
     }
 }

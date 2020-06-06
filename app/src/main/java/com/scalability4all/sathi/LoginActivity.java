@@ -16,8 +16,6 @@ import android.view.KeyEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.inputmethod.EditorInfo;
-import android.widget.AutoCompleteTextView;
-import android.widget.EditText;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AlertDialog;
@@ -25,6 +23,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.textfield.TextInputEditText;
+import com.scalability4all.sathi.services.LanguagesListCallback;
 import com.scalability4all.sathi.services.VolleyCallback;
 import com.scalability4all.sathi.services.VolleyService;
 import com.scalability4all.sathi.xmpp.RoosterConnectionService;
@@ -50,6 +49,7 @@ import java.util.Map;
 import static com.scalability4all.sathi.Constants.addHostNameToUserName;
 import static com.scalability4all.sathi.services.VolleyService.GET_HOST_NAME;
 import static com.scalability4all.sathi.services.VolleyService.GET_USER_DETAILS;
+import static com.scalability4all.sathi.services.VolleyService.getListOfLanguages;
 
 
 public class LoginActivity extends AppCompatActivity {
@@ -191,30 +191,45 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     private void getUserPreferenceData(String username) {
-        new VolleyService(new VolleyCallback() {
+        getListOfLanguages(new LanguagesListCallback() {
             @Override
-            public void notifySuccess(JSONObject response) throws JSONException {
-                try {
-                    JSONObject data = new JSONObject(response.getString("data"));
-                    SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(LoginActivity.this);
-                    List<CharSequence> newsCategory = new ArrayList<CharSequence>();
-                    JSONArray category = new JSONArray(data.getString("category"));
-                    StringBuilder categories = new StringBuilder();
-                    Map<CharSequence, String> languages_locale = Constants.languages_locale;
-
-                    for (int i = 0; i < category.length(); i++) {
-                        categories.append(category.get(i));
-                        if ((category.length() - 1) != i) {
-                            categories.append(",");
+            public void notifySuccess(Map<CharSequence, String> language_locale) throws JSONException {
+                Map<CharSequence, String> languages_locale = language_locale;
+                new VolleyService(new VolleyCallback() {
+                    @Override
+                    public void notifySuccess(JSONObject response) throws JSONException {
+                        try {
+                            JSONObject data = new JSONObject(response.getString("data"));
+                            SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(LoginActivity.this);
+                            List<CharSequence> newsCategory = new ArrayList<CharSequence>();
+                            JSONArray category = new JSONArray(data.getString("category"));
+                            StringBuilder categories = new StringBuilder();
+                            for (int i = 0; i < category.length(); i++) {
+                                categories.append(category.get(i));
+                                if ((category.length() - 1) != i) {
+                                    categories.append(",");
+                                }
+                            }
+                            prefs.edit()
+                                    .putString("language", (String) Constants.getKeyByValue(languages_locale, data.getString("language")))
+                                    .putString("category", String.valueOf(categories))
+                                    .commit();
+                        } catch (JSONException e) {
+                            e.printStackTrace();
                         }
                     }
-                    prefs.edit()
-                            .putString("language", (String) Constants.getKeyByValue(languages_locale, data.getString("language")))
-                            .putString("category", String.valueOf(categories))
-                            .commit();
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
+
+                    @Override
+                    public void notifyError(JSONObject error) {
+                        try {
+                            Log.d(LOGTAG, "Parse error in getting user details");
+                            Log.d(LOGTAG, error.getString("data"));
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+
+                    }
+                }, LoginActivity.this).getDataVolley(GET_USER_DETAILS + '/' + username.split("@")[0]);
             }
 
             @Override
@@ -225,9 +240,8 @@ public class LoginActivity extends AppCompatActivity {
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
-
             }
-        }, LoginActivity.this).getDataVolley(GET_USER_DETAILS + '/' + username.split("@")[0]);
+        }, LoginActivity.this);
     }
 
     private void getHostNameAndLogin() {

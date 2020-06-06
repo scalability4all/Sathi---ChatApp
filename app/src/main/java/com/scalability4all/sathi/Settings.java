@@ -2,8 +2,8 @@ package com.scalability4all.sathi;
 
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
-import android.preference.PreferenceManager;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.text.InputType;
 import android.util.Log;
 import android.view.MotionEvent;
@@ -18,6 +18,7 @@ import android.widget.TableRow;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.scalability4all.sathi.services.LanguagesListCallback;
 import com.scalability4all.sathi.services.VolleyCallback;
 import com.scalability4all.sathi.services.VolleyService;
 
@@ -31,14 +32,15 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static com.scalability4all.sathi.services.VolleyService.GET_CATEGORIES_LIST;
 import static com.scalability4all.sathi.services.VolleyService.UPDATE_USER_PREFERENCE_CATEGORY;
 import static com.scalability4all.sathi.services.VolleyService.UPDATE_USER_PREFERENCE_LANGUAGE;
+import static com.scalability4all.sathi.services.VolleyService.getListOfLanguages;
 
 public class Settings extends AppCompatActivity {
     private static final String LOGTAG = "Settings";
     private CharSequence[] languages;
-    private CharSequence[] newsCategories = { "Business", "Politics", "Entertainment", "LifeStyle", "India", "Sports",
-            "World" };
+    private CharSequence[] newsCategories;
     private EditText language;
     private TableLayout newsCategory;
     private String selectedLanguage;
@@ -60,12 +62,11 @@ public class Settings extends AppCompatActivity {
             username = username.split("@")[0];
         }
 
-        languages_locale = Constants.languages_locale;
-
-        languages = languages_locale.keySet().toArray(new CharSequence[0]);
 
         selectedLanguage = sh.getString("language", null);
+
         String newsCategorySavedInDb = sh.getString("category", null);
+
         if (newsCategorySavedInDb != null && newsCategorySavedInDb.length() > 0) {
             selectedNewsCategories = new ArrayList<CharSequence>(Arrays.asList(PreferenceManager
                     .getDefaultSharedPreferences(getApplicationContext()).getString("category", null).split(",")));
@@ -73,11 +74,108 @@ public class Settings extends AppCompatActivity {
             selectedNewsCategories = new ArrayList<CharSequence>();
         }
 
-        addNewsCategories(newsCategory);
+
+        getCategoriesList(newsCategory);
 
         language = findViewById(R.id.language);
         language.setInputType(InputType.TYPE_NULL);
         language.setText(selectedLanguage);
+        getLanguagesList();
+    }
+
+    private void addNewsCategories(LinearLayout linearLayout) {
+
+        TableRow row = new TableRow(getApplicationContext());
+        TableRow.LayoutParams lp = new TableRow.LayoutParams(TableRow.LayoutParams.WRAP_CONTENT);
+        row.setLayoutParams(lp);
+
+        for (int i = 0; i < newsCategories.length; i++) {
+
+            if (i != 0 && i % 2 == 0) {
+                row = new TableRow(getApplicationContext());
+                row.setLayoutParams(lp);
+            }
+
+            CheckBox checkBox = new CheckBox(getApplicationContext());
+            checkBox.setTag(newsCategories[i]);
+            checkBox.setText(newsCategories[i]);
+
+            if (selectedNewsCategories.indexOf(newsCategories[i]) != -1) {
+                checkBox.setChecked(true);
+            } else {
+                checkBox.setChecked(false);
+            }
+
+            checkBox.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    // Is the view now checked?
+                    boolean checked = ((CheckBox) view).isChecked();
+                    if (checked)
+                        selectedNewsCategories.add(((CheckBox) view).getText());
+                    else
+                        selectedNewsCategories.remove(((CheckBox) view).getText());
+
+                    saveNewsCategories();
+
+                }
+            });
+
+            row.addView(checkBox);
+            
+            // to make sure each row has two checkboxes, and a new row is created after the row is filled.
+            if (i % 2 == 0) {
+                linearLayout.addView(row);
+            }else if(i+1<newsCategories.length){
+                row = new TableRow(getApplicationContext());
+                row.setLayoutParams(lp);
+            }
+        }
+    }
+
+    private void getCategoriesList(LinearLayout linearLayout) {
+        new VolleyService(new VolleyCallback() {
+            @Override
+            public void notifySuccess(JSONObject response) throws JSONException {
+                JSONArray data = new JSONArray(response.getString("data"));
+                List<CharSequence> list = new ArrayList<CharSequence>();
+                newsCategories = new CharSequence[data.length()];
+                for (int i = 0; i < data.length(); i++) {
+                    JSONObject dat = (JSONObject) data.get(i);
+                    newsCategories[i] = dat.getString("category");
+                }
+                addNewsCategories(newsCategory);
+            }
+
+            @Override
+            public void notifyError(JSONObject error) {
+                newsCategories = new CharSequence[0];
+                addNewsCategories(newsCategory);
+            }
+        }, Settings.this).getDataVolley(GET_CATEGORIES_LIST);
+
+    }
+
+    private void getLanguagesList() {
+        getListOfLanguages(new LanguagesListCallback() {
+            @Override
+            public void notifySuccess(Map<CharSequence, String> response) throws JSONException {
+                languages_locale = response;
+                languages = languages_locale.keySet().toArray(new CharSequence[0]);
+                setLanguageTouchListener();
+            }
+
+            @Override
+            public void notifyError(JSONObject error) {
+                // TODO error dialog
+                languages_locale = new HashMap<>();
+                languages = languages_locale.keySet().toArray(new CharSequence[0]);
+                setLanguageTouchListener();
+            }
+        }, Settings.this);
+    }
+
+    void setLanguageTouchListener() {
         language.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
@@ -142,56 +240,6 @@ public class Settings extends AppCompatActivity {
                 return false;
             }
         });
-    }
-
-    private void addNewsCategories(LinearLayout linearLayout) {
-
-        TableRow row = new TableRow(getApplicationContext());
-        TableRow.LayoutParams lp = new TableRow.LayoutParams(TableRow.LayoutParams.WRAP_CONTENT);
-        row.setLayoutParams(lp);
-
-        for (int i = 0; i < newsCategories.length; i++) {
-
-            if (i != 0 && i % 2 == 0) {
-                row = new TableRow(getApplicationContext());
-                row.setLayoutParams(lp);
-            }
-
-            CheckBox checkBox = new CheckBox(getApplicationContext());
-            checkBox.setTag(newsCategories[i]);
-            checkBox.setText(newsCategories[i]);
-
-            if (selectedNewsCategories.indexOf(newsCategories[i]) != -1) {
-                checkBox.setChecked(true);
-            } else {
-                checkBox.setChecked(false);
-            }
-
-            checkBox.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    // Is the view now checked?
-                    boolean checked = ((CheckBox) view).isChecked();
-                    if (checked)
-                        selectedNewsCategories.add(((CheckBox) view).getText());
-                    else
-                        selectedNewsCategories.remove(((CheckBox) view).getText());
-
-                    saveNewsCategories();
-
-                }
-            });
-
-            row.addView(checkBox);
-            
-            // to make sure each row has two checkboxes, and a new row is created after the row is filled.
-            if (i % 2 == 0) {
-                linearLayout.addView(row);
-            }else if(i+1<newsCategories.length){
-                row = new TableRow(getApplicationContext());
-                row.setLayoutParams(lp);
-            }
-        }
     }
 
     private void saveNewsCategories() {

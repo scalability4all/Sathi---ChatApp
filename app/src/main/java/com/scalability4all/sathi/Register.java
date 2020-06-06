@@ -8,8 +8,8 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.os.Build;
-import android.preference.PreferenceManager;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.text.Editable;
 import android.text.InputType;
 import android.text.TextUtils;
@@ -26,6 +26,7 @@ import android.widget.TextView;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.scalability4all.sathi.services.LanguagesListCallback;
 import com.scalability4all.sathi.services.VolleyCallback;
 import com.scalability4all.sathi.services.VolleyService;
 import com.scalability4all.sathi.xmpp.RoosterConnectionService;
@@ -33,12 +34,9 @@ import com.scalability4all.sathi.xmpp.RoosterConnectionService;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.json.JSONStringer;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -46,7 +44,7 @@ import java.util.TimerTask;
 import static com.scalability4all.sathi.Constants.addHostNameToUserName;
 import static com.scalability4all.sathi.services.VolleyService.GET_HOST_NAME;
 import static com.scalability4all.sathi.services.VolleyService.REGISTER_USER;
-import static com.scalability4all.sathi.services.VolleyService.UPDATE_USER_PREFERENCE_LANGUAGE;
+import static com.scalability4all.sathi.services.VolleyService.getListOfLanguages;
 
 public class Register extends AppCompatActivity {
     private static final String LOGTAG = "Register";
@@ -77,9 +75,8 @@ public class Register extends AppCompatActivity {
 
         registration_error = findViewById(R.id.error_message);
 
-        languages_locale = Constants.languages_locale;
 
-        languages = languages_locale.keySet().toArray(new CharSequence[0]);
+
 
         username = findViewById(R.id.username);
         password = findViewById(R.id.password);
@@ -138,50 +135,11 @@ public class Register extends AppCompatActivity {
         language = findViewById(R.id.language);
         language.setInputType(InputType.TYPE_NULL);
 
-        language.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                if (event.getAction() == MotionEvent.ACTION_DOWN) {
-                    //dialogue popup
-                    final AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(Register.this)
-                            .setTitle(R.string.choose_language)
-                            .setPositiveButton(R.string.save, null)
-                            .setNeutralButton(R.string.cancel, null)
-                            .setSingleChoiceItems(languages, Arrays.asList(languages).indexOf(selectedLanguage), new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialogInterface, int i) {
-                                    selectedLanguage = (String) languages[i];
-                                }
-                            });
-                    final AlertDialog dialog = alertDialogBuilder.create();
-                    dialog.setOnShowListener(new DialogInterface.OnShowListener() {
-                        @Override
-                        public void onShow(DialogInterface dialogInterface) {
+        languages_locale = new HashMap<>();
+                    
+        getLanguagesList();
 
-                            Button button = dialog.getButton(AlertDialog.BUTTON_POSITIVE);
-                            button.setOnClickListener(new View.OnClickListener() {
 
-                                @Override
-                                public void onClick(View view) {
-                                    language.setText(selectedLanguage);
-                                    dialog.dismiss();
-                                }
-                            });
-                            Button close = dialog.getButton(AlertDialog.BUTTON_NEGATIVE);
-                            close.setOnClickListener(new View.OnClickListener() {
-
-                                @Override
-                                public void onClick(View view) {
-                                    dialog.dismiss();
-                                }
-                            });
-                        }
-                    });
-                    dialog.show();
-                }
-                return false;
-            }
-        });
         register = findViewById(R.id.register);
         register.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -354,6 +312,80 @@ public class Register extends AppCompatActivity {
                 }
             }
         }, Register.this).postDataVolley(REGISTER_USER, data);
+    }
+
+    private void getLanguagesList() {
+        getListOfLanguages(new LanguagesListCallback() {
+            @Override
+            public void notifySuccess(Map<CharSequence, String> response) throws JSONException {
+                languages_locale = response;
+                languages = languages_locale.keySet().toArray(new CharSequence[0]);
+                setLanguageTouchListener();
+            }
+
+            @Override
+            public void notifyError(JSONObject error) {
+               
+                try {
+                    Log.d(LOGTAG, "Parse error in getting user details");
+                    Log.d(LOGTAG, error.getString("data"));
+                    languages=languages_locale.keySet().toArray(new CharSequence[0]);;
+                    setLanguageTouchListener();
+
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+
+            }
+        }, Register.this);
+    }
+
+    void setLanguageTouchListener() {
+        language.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                if (event.getAction() == MotionEvent.ACTION_DOWN) {
+                    //dialogue popup
+                    final AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(Register.this)
+                            .setTitle(R.string.choose_language)
+                            .setPositiveButton(R.string.save, null)
+                            .setNeutralButton(R.string.cancel, null)
+                            .setSingleChoiceItems(languages, Arrays.asList(languages).indexOf(selectedLanguage), new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialogInterface, int i) {
+                                    selectedLanguage = (String) languages[i];
+                                }
+                            });
+                    final AlertDialog dialog = alertDialogBuilder.create();
+                    dialog.setOnShowListener(new DialogInterface.OnShowListener() {
+                        @Override
+                        public void onShow(DialogInterface dialogInterface) {
+
+                            Button button = dialog.getButton(AlertDialog.BUTTON_POSITIVE);
+                            button.setOnClickListener(new View.OnClickListener() {
+
+                                @Override
+                                public void onClick(View view) {
+                                    language.setText(selectedLanguage);
+                                    dialog.dismiss();
+                                }
+                            });
+                            Button close = dialog.getButton(AlertDialog.BUTTON_NEGATIVE);
+                            close.setOnClickListener(new View.OnClickListener() {
+
+                                @Override
+                                public void onClick(View view) {
+                                    dialog.dismiss();
+                                }
+                            });
+                        }
+                    });
+                    dialog.show();
+                }
+                return false;
+            }
+        });
+
     }
 
     private void getHostNameAndRegister(final String name, final String password, final String emailId, final String language) {
