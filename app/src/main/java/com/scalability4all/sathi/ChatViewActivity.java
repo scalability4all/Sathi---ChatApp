@@ -10,6 +10,8 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.speech.RecognizerIntent;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.Menu;
@@ -23,6 +25,7 @@ import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.AppCompatEditText;
 import androidx.appcompat.widget.PopupMenu;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -32,8 +35,12 @@ import com.scalability4all.sathi.model.Chat;
 import com.scalability4all.sathi.model.ChatMessagesModel;
 import com.scalability4all.sathi.model.Contact;
 import com.scalability4all.sathi.model.ContactModel;
+import com.scalability4all.sathi.services.TextWatcherService;
 import com.scalability4all.sathi.ui.KeyboardUtil;
+import com.scalability4all.sathi.xmpp.RoosterConnection;
 import com.scalability4all.sathi.xmpp.RoosterConnectionService;
+
+import org.jivesoftware.smack.packet.Presence;
 
 import java.net.URLEncoder;
 import java.util.ArrayList;
@@ -43,7 +50,9 @@ import java.util.Map;
 
 import static com.scalability4all.sathi.Constants.removeHostNameFromJID;
 
-public class ChatViewActivity extends AppCompatActivity implements ChatMessagesAdapter.OnInformRecyclerViewToScrollDownListener, KeyboardUtil.KeyboardVisibilityListener, ChatMessagesAdapter.OnItemLongClickListener {
+public class ChatViewActivity extends AppCompatActivity
+        implements ChatMessagesAdapter.OnInformRecyclerViewToScrollDownListener,
+        KeyboardUtil.KeyboardVisibilityListener, ChatMessagesAdapter.OnItemLongClickListener {
     private static final String LOGTAG = "ChatViewActivity";
     RecyclerView chatMessagesRecyclerView;
     private EditText textSendEditText;
@@ -55,12 +64,13 @@ public class ChatViewActivity extends AppCompatActivity implements ChatMessagesA
     private static final int SPEECH_REQUEST_CODE = 10;
     private View snackbarStranger;
     private String username;
+    private Boolean status_online = false;
+    private Boolean status_typing = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_chat_view);
-
 
         SharedPreferences sh = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
         username = sh.getString("xmpp_jid", null);
@@ -68,15 +78,19 @@ public class ChatViewActivity extends AppCompatActivity implements ChatMessagesA
         Intent intent = getIntent();
         counterpartJid = intent.getStringExtra("contact_jid");
         Chat.ContactType chatType = (Chat.ContactType) intent.getSerializableExtra("chat_type");
+
+        // setting title and status for chat view
         setTitle(removeHostNameFromJID(counterpartJid));
+        setStatus();
+
         chatMessagesRecyclerView = findViewById(R.id.chatMessagesRecyclerView);
         chatMessagesRecyclerView.setLayoutManager(new LinearLayoutManager(getBaseContext()));
         adapter = new ChatMessagesAdapter(getApplicationContext(), counterpartJid, username);
         adapter.setmOnInformRecyclerViewToScrollDownListener(this);
         adapter.setOnItemLongClickListener(this);
         chatMessagesRecyclerView.setAdapter(adapter);
-        //ImageView sendButton = findViewById(R.id.send_btn);
-        //ImageView cancelButton = findViewById(R.id.cancel_btn);
+        // ImageView sendButton = findViewById(R.id.send_btn);
+        // ImageView cancelButton = findViewById(R.id.cancel_btn);
         ImageButton recordButton = findViewById(R.id.record_button);
         Map<String, String> languages = new HashMap<String, String>();
         languages.put("english", "en-IN");
@@ -97,34 +111,48 @@ public class ChatViewActivity extends AppCompatActivity implements ChatMessagesA
             }
         });
         final String contactName = ""; // TODO
-        final String contactNumber = ""; //TODO
-//        sendButton.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                AlertDialog alertDialog = new AlertDialog.Builder(ChatViewActivity.this)
-//                        .setMessage(contactName + " " + getString(R.string.whatsapp_dialog_message))
-//                        .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-//                            @Override
-//                            public void onClick(DialogInterface dialog, int which) {
-//                                dialog.dismiss();
-//                            }
-//                        }).setPositiveButton("Send", new DialogInterface.OnClickListener() {
-//                            @Override
-//                            public void onClick(DialogInterface dialog, int which) {
-//                                sendWhatsApp(contactNumber, "Hey, Sending message from Zing!");
-//                            }
-//                        })
-//                        .create();
-//                alertDialog.show();
-//            }
-//        });
+        final String contactNumber = ""; // TODO
+
         textSendEditText = findViewById(R.id.textinput);
+        textSendEditText.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+
+                RoosterConnection.Composing composing = new RoosterConnection.Composing(
+                        RoosterConnection.Composing.isTyping);
+                RoosterConnectionService.getConnection().sendComposing(composing, counterpartJid, username);
+
+                RoosterConnection.Composing stopComposing = new RoosterConnection.Composing(
+                        RoosterConnection.Composing.stoppedTyping);
+
+                new android.os.Handler().postDelayed(
+                        new Runnable() {
+                            public void run() {
+                                RoosterConnectionService.getConnection().sendComposing(stopComposing, counterpartJid, username);
+                            }
+                        },
+                        1500);
+
+            }
+        });
+
         sendMessageButton = findViewById(R.id.textSendButton);
         sendMessageButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if (!textSendEditText.getText().toString().equals("")) {
-                    RoosterConnectionService.getConnection().sendMessage(textSendEditText.getText().toString(), counterpartJid, username);
+                    RoosterConnectionService.getConnection().sendMessage(textSendEditText.getText().toString(),
+                            counterpartJid, username);
                     adapter.onMessageAdd();
                     textSendEditText.getText().clear();
                 }
@@ -145,7 +173,8 @@ public class ChatViewActivity extends AppCompatActivity implements ChatMessagesA
                 chatMessagesRecyclerView.setPadding(0, 0, 0, paddingBottom);
                 snackbar.setVisibility(View.VISIBLE);
             } else {
-                int paddingBottom = getResources().getDimensionPixelOffset(R.dimen.chatview_recycler_view_padding_normal);
+                int paddingBottom = getResources()
+                        .getDimensionPixelOffset(R.dimen.chatview_recycler_view_padding_normal);
                 chatMessagesRecyclerView.setPadding(0, 0, 0, paddingBottom);
                 snackbar.setVisibility(View.GONE);
             }
@@ -170,7 +199,8 @@ public class ChatViewActivity extends AppCompatActivity implements ChatMessagesA
             @Override
             public void onClick(View v) {
                 if (ContactModel.get(getApplicationContext()).isContactStranger(counterpartJid)) {
-                    if (ContactModel.get(getApplicationContext()).addContact(new Contact(counterpartJid, Contact.SubscriptionType.NONE))) {
+                    if (ContactModel.get(getApplicationContext())
+                            .addContact(new Contact(counterpartJid, Contact.SubscriptionType.NONE))) {
                         Log.d(LOGTAG, "Previously unknown " + counterpartJid + "added now");
                     }
                 }
@@ -201,7 +231,8 @@ public class ChatViewActivity extends AppCompatActivity implements ChatMessagesA
         snackBarStrangerAddContact.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (ContactModel.get(getApplicationContext()).addContact(new Contact(counterpartJid, Contact.SubscriptionType.NONE))) {
+                if (ContactModel.get(getApplicationContext())
+                        .addContact(new Contact(counterpartJid, Contact.SubscriptionType.NONE))) {
                     if (RoosterConnectionService.getConnection().addContactToRoster(counterpartJid)) {
                         Log.d(LOGTAG, counterpartJid + " added");
                         snackbarStranger.setVisibility(View.GONE);
@@ -259,11 +290,25 @@ public class ChatViewActivity extends AppCompatActivity implements ChatMessagesA
                     case Constants.BroadCastMessages.UI_ONLINE_STATUS_CHANGE:
                         String contactJid = intent.getStringExtra(Constants.ONLINE_STATUS_CHANGE_CONTACT);
                         Log.d(LOGTAG, " Online status change " + contactJid + " to get");
+                        return;
+
+                    case Constants.BroadCastMessages.UI_TYPING_STARTED_STATUS_CHANGE:
+                        status_typing = true;
+                        setStatus();
+                        return;
+
+                    case Constants.BroadCastMessages.UI_TYPING_ENDED_STATUS_CHANGE:
+                        status_typing = false;
+                        setStatus();
+                        return;
+
                 }
             }
         };
         IntentFilter filter = new IntentFilter(Constants.BroadCastMessages.UI_NEW_MESSAGE_FLAG);
         filter.addAction(Constants.BroadCastMessages.UI_ONLINE_STATUS_CHANGE);
+        filter.addAction(Constants.BroadCastMessages.UI_TYPING_STARTED_STATUS_CHANGE);
+        filter.addAction(Constants.BroadCastMessages.UI_TYPING_ENDED_STATUS_CHANGE);
         registerReceiver(mReceiveMessageBroadcastReceiver, filter);
     }
 
@@ -303,7 +348,8 @@ public class ChatViewActivity extends AppCompatActivity implements ChatMessagesA
         PackageManager packageManager = this.getPackageManager();
         Intent i = new Intent(Intent.ACTION_VIEW);
         try {
-            String url = "https://api.whatsapp.com/send?phone=" + phone + "&text=" + URLEncoder.encode(message, "UTF-8");
+            String url = "https://api.whatsapp.com/send?phone=" + phone + "&text="
+                    + URLEncoder.encode(message, "UTF-8");
             i.setPackage("com.whatsapp");
             i.setData(Uri.parse(url));
             if (i.resolveActivity(packageManager) != null) {
@@ -331,5 +377,10 @@ public class ChatViewActivity extends AppCompatActivity implements ChatMessagesA
             }
         }
         super.onActivityResult(requestCode, resultCode, data);
+    }
+
+    public void setStatus() {
+       String status = status_typing ? "typing..." : (status_online ? "Online" : "");
+       ((AppCompatActivity) this).getSupportActionBar().setSubtitle(status);
     }
 }

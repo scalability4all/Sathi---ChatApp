@@ -18,6 +18,8 @@ public class Constants {
         public static final String UI_NEW_MESSAGE_FLAG = "com.scalability4all.sathi.ui_new_message_flag";
         public static final String UI_NEW_CHAT_ITEM = "com.scalability4all.sathi.ui_new_chat_item";
         public static final String UI_ONLINE_STATUS_CHANGE = "com.scalability4all.sathi.ui_online_status_change";
+        public static final String UI_TYPING_STARTED_STATUS_CHANGE = "com.scalability4all.sathi.ui_typing_started_status_change";
+        public static final String UI_TYPING_ENDED_STATUS_CHANGE = "com.scalability4all.sathi.ui_typing_ended_status_change";
     }
 
     public static final String UI_CONNECTION_STATUS_CHANGE = "com.scalability4all.sathi.connection_status_change";
