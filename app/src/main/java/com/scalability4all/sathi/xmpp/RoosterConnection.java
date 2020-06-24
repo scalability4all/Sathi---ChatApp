@@ -870,7 +870,7 @@ public class RoosterConnection implements ConnectionListener, SubscribeListener,
         {
             Message msg = new Message(jid);
 
-            msg.setBody("1");
+            msg.setBody("");
             msg.addExtension(new ChatStateExtension(composing.getState()));
             chat.send(msg);
         }catch (SmackException.NotConnectedException e) {
