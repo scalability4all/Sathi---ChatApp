@@ -35,7 +35,6 @@ import com.scalability4all.sathi.model.Chat;
 import com.scalability4all.sathi.model.ChatMessagesModel;
 import com.scalability4all.sathi.model.Contact;
 import com.scalability4all.sathi.model.ContactModel;
-import com.scalability4all.sathi.services.TextWatcherService;
 import com.scalability4all.sathi.ui.KeyboardUtil;
 import com.scalability4all.sathi.xmpp.RoosterConnection;
 import com.scalability4all.sathi.xmpp.RoosterConnectionService;
