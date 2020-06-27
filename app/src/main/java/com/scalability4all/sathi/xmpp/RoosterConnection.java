@@ -38,6 +38,8 @@ import org.jivesoftware.smack.roster.SubscribeListener;
 import org.jivesoftware.smack.roster.packet.RosterPacket;
 import org.jivesoftware.smack.tcp.XMPPTCPConnection;
 import org.jivesoftware.smack.tcp.XMPPTCPConnectionConfiguration;
+import org.jivesoftware.smackx.chatstates.ChatState;
+import org.jivesoftware.smackx.chatstates.packet.ChatStateExtension;
 import org.jivesoftware.smackx.ping.PingManager;
 import org.jivesoftware.smackx.ping.android.ServerPingWithAlarmManager;
 import org.jivesoftware.smackx.vcardtemp.VCardManager;
@@ -80,6 +82,22 @@ public class RoosterConnection implements ConnectionListener, SubscribeListener,
 
     public enum ConnectionState {
         OFFLINE, CONNECTING, ONLINE
+    }
+
+    public static class Composing {
+        private ChatState state;
+        public static final ChatState isTyping = ChatState.composing;
+        public static final ChatState stoppedTyping = ChatState.paused;
+
+        public Composing(ChatState state)
+        {
+            this.state = state;
+        }
+
+        public ChatState getState()
+        {
+            return (state);
+        }
     }
 
     public ConnectionState getmConnectionState() {
@@ -238,19 +256,40 @@ public class RoosterConnection implements ConnectionListener, SubscribeListener,
         chatManager.addIncomingListener(new IncomingChatMessageListener() {
             @Override
             public void newIncomingMessage(EntityBareJid from, Message message, Chat chat) {
-                Log.d(LOGTAG, "message.getBody() :" + message.getBody());
-                Log.d(LOGTAG, "message.getFrom() :" + message.getFrom());
-                String messageSource = message.getFrom().toString();
-                String contactJid = "";
-                if (messageSource.contains("/")) {
-                    contactJid = messageSource.split("/")[0];
-                    Log.d(LOGTAG, "The real jid is :" + contactJid);
-                    Log.d(LOGTAG, "The message is from :" + from);
-                } else {
-                    contactJid = messageSource;
+                String msg_xml = message.toXML().toString();
+
+                if (msg_xml.contains(ChatState.composing.toString()))
+                {
+                    Intent intent = new Intent(Constants.BroadCastMessages.UI_TYPING_STARTED_STATUS_CHANGE);
+                    Log.d(LOGTAG, "package name :" + mApplicationContext.getPackageName());
+                    intent.setPackage(mApplicationContext.getPackageName());
+                    intent.putExtra("JabberId", getContactJid(message));
+                    mApplicationContext.sendBroadcast(intent);
                 }
-                String messageBody = message.getBody();
-                translateMessage(messageBody, contactJid);
+                else if (msg_xml.contains(ChatState.paused.toString()))
+                {
+                    Intent intent = new Intent(Constants.BroadCastMessages.UI_TYPING_ENDED_STATUS_CHANGE);
+                    Log.d(LOGTAG, "package name :" + mApplicationContext.getPackageName());
+                    intent.setPackage(mApplicationContext.getPackageName());
+                    intent.putExtra("JabberId", getContactJid(message));
+                    mApplicationContext.sendBroadcast(intent);
+                }
+                else{
+                    Log.d(LOGTAG, "message.getBody() :" + message.getBody());
+                    Log.d(LOGTAG, "message.getFrom() :" + message.getFrom());
+                    String messageSource = message.getFrom().toString();
+                    String contactJid = "";
+                    if (messageSource.contains("/")) {
+                        contactJid = messageSource.split("/")[0];
+                        Log.d(LOGTAG, "The real jid is :" + contactJid);
+                        Log.d(LOGTAG, "The message is from :" + from);
+                    } else {
+                        contactJid = messageSource;
+                    }
+                    String messageBody = message.getBody();
+                    translateMessage(messageBody, contactJid);
+                }
+
             }
         });
         ServerPingWithAlarmManager.getInstanceFor(mConnection).setEnabled(true);
@@ -266,6 +305,17 @@ public class RoosterConnection implements ConnectionListener, SubscribeListener,
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
+    }
+
+    private String getContactJid(Message message){
+        String messageSource = message.getFrom().toString();
+        String contactJid = "";
+        if (messageSource.contains("/")) {
+            contactJid = messageSource.split("/")[0];
+        } else {
+            contactJid = messageSource;
+        }
+        return contactJid;
     }
 
     /**
@@ -805,4 +855,29 @@ public class RoosterConnection implements ConnectionListener, SubscribeListener,
         intent.setPackage(mApplicationContext.getPackageName());
         mApplicationContext.sendBroadcast(intent);
     }
+
+    public void sendComposing(Composing composing, String toJid,String fromJid)
+    {
+
+        EntityBareJid jid = null;
+        try {
+            jid = JidCreate.entityBareFrom(toJid);
+        } catch (XmppStringprepException e) {
+            e.printStackTrace();
+        }
+        Chat chat = chatManager.chatWith(jid);
+        try
+        {
+            Message msg = new Message(jid);
+
+            msg.setBody("");
+            msg.addExtension(new ChatStateExtension(composing.getState()));
+            chat.send(msg);
+        }catch (SmackException.NotConnectedException e) {
+            e.printStackTrace();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+    }
+
 }
