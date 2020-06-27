@@ -29,6 +29,7 @@ import org.jivesoftware.smack.XMPPException;
 import org.jivesoftware.smack.chat2.Chat;
 import org.jivesoftware.smack.chat2.ChatManager;
 import org.jivesoftware.smack.chat2.IncomingChatMessageListener;
+import org.jivesoftware.smack.packet.ExtensionElement;
 import org.jivesoftware.smack.packet.Message;
 import org.jivesoftware.smack.packet.Presence;
 import org.jivesoftware.smack.roster.Roster;
@@ -256,9 +257,9 @@ public class RoosterConnection implements ConnectionListener, SubscribeListener,
         chatManager.addIncomingListener(new IncomingChatMessageListener() {
             @Override
             public void newIncomingMessage(EntityBareJid from, Message message, Chat chat) {
-                String msg_xml = message.toXML().toString();
+                String msgState = processChatState(message);
 
-                if (msg_xml.contains(ChatState.composing.toString()))
+                if (msgState!=null && msgState.contains(ChatState.composing.toString()))
                 {
                     Intent intent = new Intent(Constants.BroadCastMessages.UI_TYPING_STARTED_STATUS_CHANGE);
                     Log.d(LOGTAG, "package name :" + mApplicationContext.getPackageName());
@@ -266,7 +267,7 @@ public class RoosterConnection implements ConnectionListener, SubscribeListener,
                     intent.putExtra("JabberId", getContactJid(message));
                     mApplicationContext.sendBroadcast(intent);
                 }
-                else if (msg_xml.contains(ChatState.paused.toString()))
+                else if (msgState!=null && msgState.contains(ChatState.paused.toString()))
                 {
                     Intent intent = new Intent(Constants.BroadCastMessages.UI_TYPING_ENDED_STATUS_CHANGE);
                     Log.d(LOGTAG, "package name :" + mApplicationContext.getPackageName());
@@ -305,6 +306,15 @@ public class RoosterConnection implements ConnectionListener, SubscribeListener,
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
+    }
+
+    private String processChatState(Message message) {
+        ExtensionElement element = message.getExtension(ChatStateExtension.NAMESPACE);
+
+        if (element != null) {
+            return element.getElementName();
+        }
+        return null;
     }
 
     private String getContactJid(Message message){
