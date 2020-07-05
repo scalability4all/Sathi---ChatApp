@@ -75,6 +75,9 @@ dependencies {
 
     implementation 'com.android.support.constraint:constraint-layout:1.1.2'
     implementation 'com.android.volley:volley:1.1.0'
+    implementation 'com.squareup.retrofit2:retrofit:2.6.1'
+    implementation 'com.squareup.retrofit2:converter-gson:2.6.1'
+    implementation 'com.google.android.material:material:1.1.0'
 
     implementation "org.igniterealtime.smack:smack-tcp:$smackVersion"
     implementation "org.igniterealtime.smack:smack-experimental:$smackVersion"

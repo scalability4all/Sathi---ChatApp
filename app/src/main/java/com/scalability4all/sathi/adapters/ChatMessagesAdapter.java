@@ -1,9 +1,14 @@
 package com.scalability4all.sathi.adapters;
 
+import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
+import android.os.Environment;
 import android.preference.PreferenceManager;
 import android.text.util.Linkify;
 import android.util.Log;
@@ -13,9 +18,18 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
+import androidx.core.content.FileProvider;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.scalability4all.sathi.BuildConfig;
+import com.scalability4all.sathi.ChatViewActivity;
+import com.scalability4all.sathi.FileHandler.FileDownloader;
+import com.scalability4all.sathi.FileHandler.Helpers;
+import com.scalability4all.sathi.FileHandler.MainActivity;
 import com.scalability4all.sathi.R;
 import com.scalability4all.sathi.Utilities;
 import com.scalability4all.sathi.model.ChatMessage;
@@ -23,6 +37,7 @@ import com.scalability4all.sathi.model.ChatMessagesModel;
 import com.scalability4all.sathi.xmpp.RoosterConnection;
 import com.scalability4all.sathi.xmpp.RoosterConnectionService;
 
+import java.io.File;
 import java.util.List;
 
 import me.saket.bettermovementmethod.BetterLinkMovementMethod;
@@ -43,6 +58,7 @@ public class ChatMessagesAdapter extends RecyclerView.Adapter<ChatMessageViewHol
     private LayoutInflater mLayoutInflater;
     private Context mContext;
     private String toContactJid;
+    public OnDownloadListener listener;
 
     public String getFromContactJid() {
         return fromContactJid;
@@ -67,7 +83,9 @@ public class ChatMessagesAdapter extends RecyclerView.Adapter<ChatMessageViewHol
     public void setOnItemLongClickListener(OnItemLongClickListener onItemLongClickListener) {
         this.onItemLongClickListener = onItemLongClickListener;
     }
-
+    public void setListener(OnDownloadListener listener){
+        this.listener = listener;
+    }
     public Context getContext() {
         return mContext;
     }
@@ -131,6 +149,9 @@ public class ChatMessagesAdapter extends RecyclerView.Adapter<ChatMessageViewHol
         notifyDataSetChanged();
         informRecyclerViewToScrollDown();
     }
+    public interface OnDownloadListener{
+        void onDownloadListener(ChatMessage message);
+    }
 }
 
 class ChatMessageViewHolder extends RecyclerView.ViewHolder {
@@ -139,6 +160,7 @@ class ChatMessageViewHolder extends RecyclerView.ViewHolder {
     private ImageView profileImage;
     private ChatMessage mChatMessage;
     private ChatMessagesAdapter mAdapter;
+
 
     public ChatMessageViewHolder(final View itemView, final ChatMessagesAdapter mAdapter) {
         super(itemView);
@@ -161,28 +183,64 @@ class ChatMessageViewHolder extends RecyclerView.ViewHolder {
         });
     }
 
+
     public void bindChat(ChatMessage chatMessage) {
         mChatMessage = chatMessage;
-        mMessageBody.setText(chatMessage.getMessage());
-        // https://github.com/saket/Better-Link-Movement-Method
-        // http://saket.me/better-url-handler-textview-android/
-        BetterLinkMovementMethod
-                .linkify(Linkify.ALL, mMessageBody)
-                .setOnLinkClickListener((textView, url) -> {
-                    Intent i = new Intent(Intent.ACTION_VIEW);
-                    i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                    i.setData(Uri.parse(url));
-                    mAdapter.getContext().startActivity(i);
-                    return true;
-                })
-                .setOnLinkLongClickListener((textView, url) -> {
-                    // Handle long-clicks.
-                    return true;
-                });
+        String message = chatMessage.getMessage();
+        ChatMessage.Type type = mChatMessage.getType();
         mMessageTimestamp.setText(Utilities.getFormattedTime(chatMessage.getTimestamp()));
         profileImage.setImageResource(R.mipmap.ic_profile);
-        ChatMessage.Type type = mChatMessage.getType();
+        Helpers help = new Helpers();
         if (type == ChatMessage.Type.RECEIVED) {
+            if(help.IsUploadMessage(message)){
+                Bitmap icon = BitmapFactory.decodeResource(mAdapter.getContext().getResources(),
+                        R.mipmap.download_file);
+                help.setImage(icon, mMessageBody);
+                mMessageBody.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        mAdapter.listener.onDownloadListener(mChatMessage);
+                    }
+                });
+            }
+            else if(help.IsDownloadmessage(message)){
+                String filename = help.GetDownloadFileName(message);
+                File destinationFile = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS), filename);
+                Bitmap bm = help.getBitmap(destinationFile);
+                help.setImage(bm, mMessageBody);
+                mMessageBody.setOnClickListener(new View.OnClickListener(){
+                    @Override
+                    public void onClick(View V){
+                        Intent myIntent = new Intent(Intent.ACTION_VIEW);
+                        myIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                        Uri uri = FileProvider.getUriForFile(mAdapter.getContext(), BuildConfig.APPLICATION_ID + ".provider", destinationFile);
+                        myIntent.setData(uri);
+                        myIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                        Intent j = Intent.createChooser(myIntent, "Choose an application to open with:");
+                        j.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+
+                        mAdapter.getContext().startActivity(j);
+                    }
+                });
+            }
+            else {
+                mMessageBody.setText(message);
+                // https://github.com/saket/Better-Link-Movement-Method
+                // http://saket.me/better-url-handler-textview-android/
+                BetterLinkMovementMethod
+                        .linkify(Linkify.ALL, mMessageBody)
+                        .setOnLinkClickListener((textView, url) -> {
+                            Intent i = new Intent(Intent.ACTION_VIEW);
+                            i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                            i.setData(Uri.parse(url));
+                            mAdapter.getContext().startActivity(i);
+                            return true;
+                        })
+                        .setOnLinkLongClickListener((textView, url) -> {
+                            // Handle long-clicks.
+                            return true;
+                        });
+            }
             RoosterConnection rc = RoosterConnectionService.getConnection();
             if (rc != null) {
                 String imageAbsPath = rc.getProfileImageAbsolutePath(mChatMessage.getToContactJid());
@@ -193,6 +251,42 @@ class ChatMessageViewHolder extends RecyclerView.ViewHolder {
             }
         }
         if (type == ChatMessage.Type.SENT) {
+            if(help.IsUploadMessage(message)){
+                String file = help.GetUriFromUpload(message);
+                Bitmap bm = help.getBitmap(file);
+                help.setImage(bm, mMessageBody);
+                mMessageBody.setOnClickListener(new View.OnClickListener(){
+                    @Override
+                    public void onClick(View V){
+                        Intent myIntent = new Intent(Intent.ACTION_VIEW);
+                        myIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                        Uri uri = FileProvider.getUriForFile(mAdapter.getContext(), BuildConfig.APPLICATION_ID + ".provider",new File(file));
+                        myIntent.setData(uri);
+                        myIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                        Intent j = Intent.createChooser(myIntent, "Choose an application to open with:");
+                        j.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                        mAdapter.getContext().startActivity(j);
+                    }
+                });
+            }
+            else {
+                mMessageBody.setText(message);
+                // https://github.com/saket/Better-Link-Movement-Method
+                // http://saket.me/better-url-handler-textview-android/
+                BetterLinkMovementMethod
+                        .linkify(Linkify.ALL, mMessageBody)
+                        .setOnLinkClickListener((textView, url) -> {
+                            Intent i = new Intent(Intent.ACTION_VIEW);
+                            i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                            i.setData(Uri.parse(url));
+                            mAdapter.getContext().startActivity(i);
+                            return true;
+                        })
+                        .setOnLinkLongClickListener((textView, url) -> {
+                            // Handle long-clicks.
+                            return true;
+                        });
+            }
             RoosterConnection rc = RoosterConnectionService.getConnection();
             if (rc != null) {
                 String selfJid = PreferenceManager.getDefaultSharedPreferences(mAdapter.getContext()).getString("xmpp_jid", null);
@@ -209,4 +303,5 @@ class ChatMessageViewHolder extends RecyclerView.ViewHolder {
             }
         }
     }
+
 }

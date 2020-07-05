@@ -34,7 +34,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentLeft="true"
-            android:layout_marginLeft="50dp"
+            android:layout_marginLeft="85dp"
             android:layout_marginRight="3dp"
             android:layout_toLeftOf="@+id/textSendButton"
             android:background="@drawable/tinput_border"
@@ -100,6 +100,17 @@
         android:layout_marginLeft="5dp"
         android:background="@drawable/contact_circle"
         android:backgroundTint="@color/colorAccent"
+        />
+    <ImageButton
+        android:id="@+id/upload_button"
+        android:src="@drawable/upload_button"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_alignParentBottom="true"
+        android:layout_marginBottom="10dp"
+        android:layout_marginLeft="50dp"
+        android:background="@drawable/contact_circle"
+        android:backgroundTint="@color/design_default_color_primary_variant"
         />
     <RelativeLayout
         android:id="@+id/snackbar"

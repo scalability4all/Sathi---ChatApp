@@ -1,5 +1,6 @@
 package com.scalability4all.sathi;
 
+import android.Manifest;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -25,13 +26,18 @@ import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.AppCompatEditText;
 import androidx.appcompat.widget.PopupMenu;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.scalability4all.sathi.FileHandler.FileDownloader;
+import com.scalability4all.sathi.FileHandler.Helpers;
+import com.scalability4all.sathi.FileHandler.MainActivity;
 import com.scalability4all.sathi.adapters.ChatMessagesAdapter;
 import com.scalability4all.sathi.model.Chat;
+import com.scalability4all.sathi.model.ChatMessage;
 import com.scalability4all.sathi.model.ChatMessagesModel;
 import com.scalability4all.sathi.model.Contact;
 import com.scalability4all.sathi.model.ContactModel;
@@ -39,12 +45,9 @@ import com.scalability4all.sathi.ui.KeyboardUtil;
 import com.scalability4all.sathi.xmpp.RoosterConnection;
 import com.scalability4all.sathi.xmpp.RoosterConnectionService;
 
-import org.jivesoftware.smack.packet.Presence;
-
 import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Locale;
 import java.util.Map;
 
 import static com.scalability4all.sathi.Constants.removeHostNameFromJID;
@@ -65,7 +68,7 @@ public class ChatViewActivity extends AppCompatActivity
     private String username;
     private Boolean status_online = false;
     private Boolean status_typing = false;
-
+    private MainActivity uploadHandler;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -87,6 +90,22 @@ public class ChatViewActivity extends AppCompatActivity
         adapter = new ChatMessagesAdapter(getApplicationContext(), counterpartJid, username);
         adapter.setmOnInformRecyclerViewToScrollDownListener(this);
         adapter.setOnItemLongClickListener(this);
+        adapter.setListener(new ChatMessagesAdapter.OnDownloadListener() {
+
+            @Override
+            public void onDownloadListener(ChatMessage message) {
+                if(askForPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE, 101)){
+                    Helpers h = new Helpers();
+                    String chat_message = message.getMessage();
+                    String filepath = h.GetFileFromUpload(chat_message);
+                    String filename = h.GetDownloadFileName(chat_message);
+                    new FileDownloader(getApplicationContext()).downloadZipFile(filepath, filename, message, adapter);
+                }
+                //This portion will get execute when user will click on call button.
+                // Now here you can check for the permission, if it is granted,
+                // you can fire `ACTION_CALL` intent.
+            }
+        });
         chatMessagesRecyclerView.setAdapter(adapter);
         // ImageView sendButton = findViewById(R.id.send_btn);
         // ImageView cancelButton = findViewById(R.id.cancel_btn);
@@ -247,6 +266,33 @@ public class ChatViewActivity extends AppCompatActivity
             }
         });
         KeyboardUtil.setKeyboardVisibilityListener(this, this);
+        AddHanlderToUploadFiles();
+        uploadHandler = new MainActivity(this, this);
+    }
+    public void AddHanlderToUploadFiles(){
+        findViewById(R.id.upload_button).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (ContextCompat.checkSelfPermission(ChatViewActivity.this, Manifest.permission.READ_EXTERNAL_STORAGE)
+                        != PackageManager.PERMISSION_GRANTED) {
+                    ActivityCompat.requestPermissions(ChatViewActivity.this,
+                            new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},
+                            2);
+                } else {
+                    Intent intent = new Intent();
+                    intent.setType("image/*");
+                    intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, false);
+                    intent.setAction(Intent.ACTION_GET_CONTENT);
+                    startActivityForResult(Intent.createChooser(intent, "Select Picture"), 1);
+                }
+            }
+        });
+    }
+
+    public void MessageSend(String message){
+        RoosterConnectionService.getConnection().sendMessage(message,
+                counterpartJid, username);
+        adapter.onMessageAdd();
     }
 
     @Override
@@ -375,11 +421,68 @@ public class ChatViewActivity extends AppCompatActivity
                 Log.d("speech", speechData.toString());
             }
         }
+        if (requestCode == 1 && null != data) {
+            if (data.getClipData() != null) {
+                int count = data.getClipData().getItemCount(); //evaluate the count before the for loop --- otherwise, the count is evaluated every loop.
+                for (int i = 0; i < count; i++) {
+                    Uri imageUri = data.getClipData().getItemAt(i).getUri();
+                    uploadHandler.getImageFilePath(imageUri);
+                }
+            }
+            else if(data.getData() != null){ // Single File Selected
+                uploadHandler.getImageFilePath(data.getData());
+            }
+            Log.d("size", String.valueOf(uploadHandler.GetFiles().size()));
+            if (uploadHandler.GetFiles().size() > 0) {
+                uploadHandler.uploadFiles();
+            }
+        }
+        if (requestCode == 2 && data != null){
+            Intent intent = new Intent();
+            intent.setType("image/*");
+            intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, false);
+            intent.setAction(Intent.ACTION_GET_CONTENT);
+            startActivityForResult(Intent.createChooser(intent, "Select Picture"), 1);
+        }
         super.onActivityResult(requestCode, resultCode, data);
     }
 
     public void setStatus() {
        String status = status_typing ? "typing..." : (status_online ? "Online" : "");
        ((AppCompatActivity) this).getSupportActionBar().setSubtitle(status);
+    }
+    private boolean askForPermission(String permission, Integer requestCode) {
+        if (ContextCompat.checkSelfPermission(ChatViewActivity.this, permission) != PackageManager.PERMISSION_GRANTED) {
+
+
+            if (ActivityCompat.shouldShowRequestPermissionRationale(ChatViewActivity.this, permission)) {
+                ActivityCompat.requestPermissions(ChatViewActivity.this, new String[]{permission}, requestCode);
+
+            } else {
+                ActivityCompat.requestPermissions(ChatViewActivity.this, new String[]{permission}, requestCode);
+            }
+            return false;
+        } else if (ContextCompat.checkSelfPermission(ChatViewActivity.this, permission) == PackageManager.PERMISSION_DENIED) {
+            Toast.makeText(getApplicationContext(), "Permission was denied", Toast.LENGTH_SHORT).show();
+            return false;
+        }
+        else{
+            return true;
+        }
+
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (ActivityCompat.checkSelfPermission(this, permissions[0]) != PackageManager.PERMISSION_DENIED) {
+
+            if (requestCode == 101) {
+                Toast.makeText(this, "Permission granted, Please Try Again.", Toast.LENGTH_SHORT).show();
+            }
+        } else {
+            Log.d("hello", "permission");
+            Toast.makeText(this, "Permission denied", Toast.LENGTH_SHORT).show();
+        }
     }
 }
