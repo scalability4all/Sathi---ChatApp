@@ -22,6 +22,7 @@ import android.widget.TextView;
 import androidx.core.content.res.ResourcesCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.scalability4all.sathi.FileHandler.Helpers;
 import com.scalability4all.sathi.R;
 import com.scalability4all.sathi.Utilities;
 import com.scalability4all.sathi.model.Chat;
@@ -151,10 +152,12 @@ class ChatHolder extends RecyclerView.ViewHolder {
     private Chat mChat;
     private ChatListAdapter mChatListAdapter;
     public Context mContext;
+    Helpers fileHelper;
 
     public ChatHolder(final View itemView, ChatListAdapter adapter, Context mContext) {
         super(itemView);
         this.mContext = mContext;
+        fileHelper = new Helpers();
         contactTextView = itemView.findViewById(R.id.contact_jid);
         messageAbstractTextView = itemView.findViewById(R.id.message_abstract);
         timestampTextView = itemView.findViewById(R.id.text_message_timestamp);
@@ -207,8 +210,14 @@ class ChatHolder extends RecyclerView.ViewHolder {
         Typeface typeface = ResourcesCompat.getFont(this.mContext, R.font.nanosanslight);
         messageAbstractTextView.setTypeface(typeface);
         String message = chat.getLastMessage();
-        TextUtils.htmlEncode(message);
-        messageAbstractTextView.setText(fromHtml(message));
+        if(fileHelper.IsDownloadmessage(message) || fileHelper.IsUploadMessage(message)){
+            messageAbstractTextView.setCompoundDrawablesWithIntrinsicBounds(
+                    R.drawable.folder_share, 0, 0, 0);
+            messageAbstractTextView.setText("");
+        }
+        else {
+            messageAbstractTextView.setText(message);
+        }
         timestampTextView.setMovementMethod(LinkMovementMethod.getInstance());
         timestampTextView.setText(Utilities.getFormattedTime(mChat.getLastMessageTimeStamp()));
 

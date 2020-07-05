@@ -60,6 +60,22 @@ public class ChatMessagesModel {
         return deleteMessage(message.getPersistID());
     }
 
+    public boolean updateMessage(ChatMessage message) {
+        return updateMessage(message.getPersistID(), message.getMessage());
+    }
+    public boolean updateMessage(int uniqueId, String message) {
+        ContentValues contentValues = new ContentValues();
+        contentValues.put(ChatMessage.Cols.MESSAGE, message);
+        int value = mDatabase.update(ChatMessage.TABLE_NAME, contentValues, ChatMessage.Cols.CHAT_MESSAGE_UNIQUE_ID + "=?", new String[]{String.valueOf(uniqueId)});
+        if (value == 1) {
+            Log.d(LOGTAG, "Successfully updated a record");
+            return true;
+        } else {
+            Log.d(LOGTAG, "Could not update record");
+            return false;
+        }
+    }
+
     public boolean deleteMessage(int uniqueId) {
         int value = mDatabase.delete(ChatMessage.TABLE_NAME, ChatMessage.Cols.CHAT_MESSAGE_UNIQUE_ID + "=?", new String[]{String.valueOf(uniqueId)});
         if (value == 1) {
